@@ -1,0 +1,5 @@
+src/main/resources
+bin
+out/production/vertx-service-registry
+out/test/vertx-service-registry
+build/deps

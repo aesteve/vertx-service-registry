@@ -1,0 +1,4 @@
+{
+  "main":"groovy:io.vertx.serviceregistry.WebServer",
+  "auto-redeploy": true
+}
