@@ -2,81 +2,25 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="/assets/stylesheets/main.css">
+		<link rel="stylesheet" href="/assets/stylesheets/libs/bootstrap.min.css">
+		<link rel="stylesheet" href="/assets/stylesheets/libs/bootstrap-theme.min.css">
 		<script type="text/javascript" src="/assets/scripts/libs/jquery-2.1.1.min.js"></script>
 		<script type="text/javascript" src="/assets/scripts/libs/underscore-1.7.0.min.js"></script>
 		<script type="text/javascript" src="/assets/scripts/libs/angular-1.2.0.min.js"></script>
+		<script type="text/javascript" src="/assets/scripts/libs/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/assets/scripts/app.js"></script>
 	</head>
 	<body ng-app="VertxServices">
 		<h1>Services registry</h1>
 		<div ng-controller="ServicesListCtrl" ng-cloack>
 			<div class="search-bar">
-				<span class="filters">Filters: <span class="tag" ng-click="removeTagFromSearch(tag)" ng-repeat="tag in filters.tags">{{tag}}</span></span>
-				<span class="counters">{{matchingServices.length}} / {{services.length}} services</span>
 				<span class="search"><input type="text" ng-model="filters.search" placeholder="Search service" ng-change="updateMatchingServices()" /></span>
+				<span class="filters" ng-if="filters.tags.length > 0">Filters: <span class="tag" ng-click="removeTagFromSearch(tag)" ng-repeat="tag in filters.tags">{{tag}}</span></span>
+				<span class="counters">{{matchingServices.length}} / {{services.length}} services</span>
+				<div class="reset"></div>
 			</div>
 			<div class="services" ng-if="status == 'Finished'">
-				<div class="service" ng-repeat="service in matchingServices">
-					<div class="service-head" ng-click="toggle(service)">
-						<div class="left">
-							{{service.artifactId}}
-						</div>
-						<div class="right latest-version">
-							Latest version: {{service.versions[service.versions.length-1].name}} ({{service.versions[service.versions.length-1].timestamp}})
-						</div>
-						<div style="clear:both"></div>
-					</div>
-					<div class="service-main-content" ng-show="service == expanded">
-						<table class="no-style-type left service-infos">
-							<tr>
-								<td>Group id:</td>
-								<td>{{service.groupId}}</td>
-							</tr>
-							<tr>
-								<td>Artifact id:</td>
-								<td>{{service.artifactId}}</td>
-							</tr>
-							<tr ng-if="service.complementaryInfos">
-								<td>Description:</td>
-								<td>{{service.complementaryInfos["description"]}}</td>
-							</tr>
-							<tr ng-if="service.complementaryInfos">
-								<td>Author:</td>
-								<td>{{service.complementaryInfos["author"]}}</td>
-							</tr>
-							<tr ng-if="service.complementaryInfos">
-								<td>Homepage:</td>
-								<td>
-									<a href="{{service.complementaryInfos['homepage']}}">{{service.complementaryInfos["homepage"]}}</a>
-								</td>
-							</tr>
-							<tr ng-if="service.complementaryInfos">
-								<td>Licenses:</td>
-								<td>
-									<span class="license" ng-repeat="license in service.complementaryInfos['licenses']">{{license}}</span>
-								</td>
-							</tr>
-						</table>
-						<div style="clear:both"></div>
-					</div>
-					<div class="service-foot" ng-show="service == expanded">
-						<div class="left">
-						Tags : 
-						<ul class="flat-list no-style-type">
-							<li class="tag" ng-click="addTagToSearch(tag)" ng-repeat="tag in service.tags">{{tag}}</li>
-							<li class="tag" ng-click="addTagToSearch(tag)" ng-repeat="tag in service.complementaryInfos['keywords'] track by $index">{{tag}}</li>
-						</ul>
-						</div>
-						<div class="right">
-							Versions:
-								<ul class="flat-list no-style-type">
-									<li class="version" ng-repeat="version in service.version">{{version.name}}</li>
-								</ul> 
-							</li>
-						</div>
-						<div style="clear:both"></div>
-					</div>
-				</div>
+				<service ng-repeat="service in matchingServices" service="service"></service>
 			</div>
 		</div>
 	</body>

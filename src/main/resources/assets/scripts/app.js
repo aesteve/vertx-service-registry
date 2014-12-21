@@ -2,6 +2,37 @@
 // Main module
 app = angular.module("VertxServices", []);
 // Register directives
+app.directive("service", function(){
+	return {
+		restrict:'E',
+		scope:{
+			service:'='
+		},
+		controller:function($scope){
+			$scope.expanded = false;
+			$scope.toggle = function(){
+				$scope.expanded = !$scope.expanded;
+			}
+		},
+		templateUrl:"/assets/directives/service.html"
+	};
+});
+app.directive("date", function(){
+	return {
+		restrict:'E',
+		scope:{
+			date:'='
+		},
+		controller:function($scope){
+			$scope.format = function(){
+				console.log($scope.date);
+				return new Date($scope.date).toDateString();
+			};
+		},
+		templateUrl:"/assets/directives/date.html"
+	};
+});
+
 
 // Register controllers
 app.controller("ServicesListCtrl", function($scope){
@@ -36,6 +67,9 @@ app.controller("ServicesListCtrl", function($scope){
 	var anyPropMatches = function(map, criteria){
 		var atLeastOneMatch = false;
 		_.each(map, function(value){
+			if(atLeastOneMatch) {// no need to recheck
+				return
+			}
 			if(_.isString(value)){
 				atLeastOneMatch = atLeastOneMatch || matches(value, criteria);
 			} else if(_.isArray(value)){
@@ -52,14 +86,20 @@ app.controller("ServicesListCtrl", function($scope){
 	var containsTag = function(service, tags){
 		var atLeastOneMatch = false;
 		_.each(service.tags, function(tag){
+			if(atLeastOneMatch) {
+				return
+			}
 			_.each(tags, function(tagFilter){
 				if(tag == tagFilter) {
 					atLeastOneMatch = true;
 				}
 			});
 		});
-		if(service.complementaryInfos && service.complementaryInfos["keywords"]){
+		if(service.complementaryInfos && service.complementaryInfos["keywords"] && !atLeastOneMatch){
 			_.each(service.complementaryInfos["keywords"], function(keyword){
+				if(atLeastOneMatch) {
+					return
+				}
 				_.each(tags, function(tag){
 					if(keyword == tag) {
 						atLeastOneMatch = true;
@@ -87,14 +127,6 @@ app.controller("ServicesListCtrl", function($scope){
 			}
 			return matching;
 		})
-	};
-	
-	$scope.toggle = function(service){
-		if($scope.expanded == service){
-			$scope.expanded = {};
-		} else {
-			$scope.expanded = service;
-		}
 	};
 	
 	$scope.addTagToSearch = function(tag){
