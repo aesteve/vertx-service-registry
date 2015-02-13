@@ -49,9 +49,9 @@ class WebServer extends Verticle {
 		String filePath = container.config["JSON_FILE"] as String
 		if (!filePath)
 			throw new IllegalArgumentException("No json file configured, please add it into mod.json")
-		jsonFile = new File(filePath)
-		if(!jsonFile.exists() || !jsonFile.isFile())
-			throw new IllegalArgumentException("The specified json file doesn't exist")
+//		jsonFile = new File(filePath)
+//		if(!jsonFile.exists() || !jsonFile.isFile())
+//			throw new IllegalArgumentException("The specified json file doesn't exist")
 	}
 
 	@Override
