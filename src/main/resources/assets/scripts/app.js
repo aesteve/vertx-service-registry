@@ -25,7 +25,6 @@ app.directive("date", function(){
 		},
 		controller:function($scope){
 			$scope.format = function(){
-				console.log($scope.date);
 				return new Date($scope.date).toDateString();
 			};
 		},
