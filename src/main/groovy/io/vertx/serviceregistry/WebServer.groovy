@@ -3,22 +3,37 @@ package io.vertx.serviceregistry
 import io.vertx.serviceregistry.api.ApiResources
 import io.vertx.serviceregistry.factory.ArtifactsFactory
 
+import org.vertx.groovy.core.AsyncResult
+import org.vertx.groovy.core.buffer.Buffer
+import org.vertx.groovy.core.file.AsyncFile
 import org.vertx.groovy.core.http.HttpServer
 import org.vertx.groovy.core.http.HttpServerRequest
 import org.vertx.groovy.core.http.HttpServerResponse
 import org.vertx.groovy.platform.Verticle
+import org.vertx.java.core.Handler
 
 class WebServer extends Verticle {
+	private final static String DEFAULT_ADDRESS = "localhost"
+	private final static Integer DEFAULT_PORT = 90
 
 	HttpServer server
 	ApiResources apiResources
 	File jsonFile
+	Integer port
+	String address
 
 	@Override
 	def start(){
 		checkConfig()
 		apiResources = new ApiResources()
-		ArtifactsFactory.instance().jsonFile = jsonFile
+		vertx.fileSystem.readFile("export.json", { AsyncResult<Buffer> result ->
+			if (result.succeeded) {
+				Buffer b = result.result
+				ArtifactsFactory.load(b.toString())
+			} else {
+				println "Failed to read", result.cause
+			}		
+		})
 		server = vertx.createHttpServer()
 		server.requestHandler { HttpServerRequest request ->
 			request.response.with { HttpServerResponse response ->
@@ -42,16 +57,22 @@ class WebServer extends Verticle {
 				}
 			}
 		}
-		server.listen(80)
+		server.listen(port, address)
+		println("Vertx-Service-Registry listening on port $port , address $address")
 	}
 
 	private void checkConfig(){
-		String filePath = container.config["JSON_FILE"] as String
-		if (!filePath)
-			throw new IllegalArgumentException("No json file configured, please add it into mod.json")
-//		jsonFile = new File(filePath)
-//		if(!jsonFile.exists() || !jsonFile.isFile())
-//			throw new IllegalArgumentException("The specified json file doesn't exist")
+		if (container.env['OPENSHIFT_VERTX_PORT'])
+			port = Integer.parseInt(container.env['OPENSHIFT_VERTX_PORT'])
+		else
+			port = Integer.parseInt("8080")
+
+		address = container.env['OPENSHIFT_VERTX_IP']
+		if (!port)
+			port = DEFAULT_PORT
+
+		if (!address)
+			address = DEFAULT_ADDRESS
 	}
 
 	@Override

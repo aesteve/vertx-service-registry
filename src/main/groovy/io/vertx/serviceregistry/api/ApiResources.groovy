@@ -9,7 +9,7 @@ import org.vertx.groovy.core.http.HttpServerRequest
 class ApiResources {
 	static void serveResource(HttpServerRequest request){
 		if(request.path == "/api/1/services" && request.method == "GET"){
-			Set<Artifact> artifacts = ArtifactsFactory.instance().fromJsonFile()
+			Set<Artifact> artifacts = ArtifactsFactory.artifacts
 			String json = new JsonBuilder(artifacts).toString()
 			request.response.end(json)
 		} else {

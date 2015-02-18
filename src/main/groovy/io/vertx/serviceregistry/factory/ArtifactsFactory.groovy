@@ -5,24 +5,14 @@ import io.vertx.serviceregistry.model.Artifact
 
 class ArtifactsFactory {
 
-	File jsonFile
-
-	private JsonSlurper slurper
+	private static JsonSlurper slurper
 	private static ArtifactsFactory instance
 
-	static ArtifactsFactory instance(){
-		if(!instance)
-			instance = new ArtifactsFactory()
-		instance
-	}
-
-	private ArtifactsFactory(){
-		slurper = new JsonSlurper()
-	}
-
-	Set<Artifact> fromJsonFile(){
-		if(!jsonFile || !jsonFile.exists())
-			throw new IllegalArgumentException("The export file hasn't been configured")
-		slurper.parse(jsonFile)
+	static Set<Artifact> artifacts
+	
+	static void load(String json){
+		if (!slurper)
+			slurper = new JsonSlurper()
+		artifacts = slurper.parseText(json)
 	}
 }

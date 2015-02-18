@@ -2,8 +2,9 @@ apply from: "gradle/vertx.gradle"
 
 dependencies {
 
-  provided "org.codehaus.groovy:groovy-all:$groovyVersion"
-  provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
+	compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
+	provided "org.codehaus.groovy:groovy-all:$groovyVersion"
+	provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
 
 }
 
