@@ -1,13 +1,61 @@
-apply from: "gradle/vertx.gradle"
-
-dependencies {
-
-	compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
-	provided "org.codehaus.groovy:groovy-all:$groovyVersion"
-	provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
-
+buildscript {
+	repositories { jcenter() }
+	dependencies {
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.1'
+	}
 }
 
-test {
+apply plugin:'eclipse'
+apply plugin: 'groovy'
+apply plugin: 'com.github.johnrengelman.shadow'
 
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
+
+dependencies {
+    // vertx
+	compile 'io.vertx:vertx-core:3.0.0-SNAPSHOT'
+	compile 'io.vertx:vertx-apex:3.0.0-SNAPSHOT'
+	compile 'io.vertx:vertx-lang-groovy:3.0.0-SNAPSHOT'
+	
+	compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.5'
+	compile "org.codehaus.groovy:groovy-all:2.4.0"
+}
+
+//sourceCompatibility='1.8'
+//targetCompatibility='1.8'
+
+if (!JavaVersion.current().java8Compatible) {
+	throw new IllegalStateException("This needs Java 8. You are using ${JavaVersion.current()}.")
+}
+
+
+shadowJar  {
+	classifier = 'vertx'
+	manifest {
+		attributes 'Main-Class': 'io.vertx.core.Starter'
+		attributes 'Main-Verticle': 'groovy:io.vertx.serviceregistry.WebServer'
+	}
+	mergeServiceFiles {
+		include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+	}
+	dependencies {
+		exclude(dependency('io.vertx:codegen'))
+		exclude(dependency('junit:junit'))
+		exclude(dependency('org.mvel:mvel2'))
+	}
+}
+
+task start(dependsOn: shadowJar) << {
+	javaexec { main="-jar"; args shadowJar.archivePath } 
+}
+
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.0'
 }

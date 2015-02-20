@@ -9,7 +9,7 @@ class ArtifactsFactory {
 	private static ArtifactsFactory instance
 
 	static Set<Artifact> artifacts
-	
+
 	static void load(String json){
 		if (!slurper)
 			slurper = new JsonSlurper()
