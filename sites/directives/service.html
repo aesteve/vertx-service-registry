@@ -1,0 +1,61 @@
+<div class="service">
+	<div class="service-head" ng-click="toggle()">
+		<div class="left">
+			{{service.artifactId}}
+		</div>
+		<div class="right latest-version">
+			Latest version: {{service.versions[service.versions.length-1].name}} (<date date="service.versions[service.versions.length-1].timestamp"></date>)
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	<div class="service-main-content" ng-show="expanded">
+		<table class="no-style-type left service-infos">
+			<tr>
+				<td>Group id:</td>
+				<td>{{service.groupId}}</td>
+			</tr>
+			<tr>
+				<td>Artifact id:</td>
+				<td>{{service.artifactId}}</td>
+			</tr>
+			<tr ng-if="service.complementaryInfos">
+				<td>Description:</td>
+				<td>{{service.complementaryInfos["description"]}}</td>
+			</tr>
+			<tr ng-if="service.complementaryInfos">
+				<td>Author:</td>
+				<td>{{service.complementaryInfos["author"]}}</td>
+			</tr>
+			<tr ng-if="service.complementaryInfos">
+				<td>Homepage:</td>
+				<td>
+					<a href="{{service.complementaryInfos['homepage']}}">{{service.complementaryInfos["homepage"]}}</a>
+				</td>
+			</tr>
+			<tr ng-if="service.complementaryInfos">
+				<td>Licenses:</td>
+				<td>
+					<span class="license" ng-repeat="license in service.complementaryInfos['licenses']">{{license}}</span>
+				</td>
+			</tr>
+		</table>
+		<div style="clear:both"></div>
+	</div>
+	<div class="service-foot" ng-show="expanded">
+		<div class="left">
+		Tags : 
+		<ul class="flat-list no-style-type">
+			<li class="tag" ng-click="addTagToSearch(tag)" ng-repeat="tag in service.tags">{{tag}}</li>
+			<li class="tag" ng-click="addTagToSearch(tag)" ng-repeat="tag in service.complementaryInfos['keywords'] track by $index">{{tag}}</li>
+		</ul>
+		</div>
+		<div class="right">
+			Versions:
+				<ul class="flat-list no-style-type">
+					<li class="version" ng-repeat="version in service.version">{{version.name}}</li>
+				</ul> 
+			</li>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+</div>
