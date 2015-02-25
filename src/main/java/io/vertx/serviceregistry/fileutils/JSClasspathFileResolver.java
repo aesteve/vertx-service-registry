@@ -1,4 +1,4 @@
-package io.vertx.react.filesystem;
+package io.vertx.serviceregistry.fileutils;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxException;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class ClasspathFileResolver {
+public class JSClasspathFileResolver {
 
 	private static List<String> sourceDirs = Arrays.asList(
 			"src/main/resources", "src/test/resources");
@@ -69,7 +69,7 @@ public class ClasspathFileResolver {
 
 			// Maybe source file is in a jar?
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			cl = cl == null ? ClasspathFileResolver.class.getClassLoader() : cl;
+			cl = cl == null ? JSClasspathFileResolver.class.getClassLoader() : cl;
 
 			URL url = cl.getResource(scriptName);
 			if (url != null) {

@@ -30,7 +30,7 @@ public class WebServer implements Verticle {
 	public void start(Future<Void> future) throws Exception {
 		checkConfig();
 
-		engine = new ReactTemplateEngine();
+		engine = new ReactTemplateEngine("");
 
 		Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "export.json");
 		ArtifactsFactory.load(b.toString("UTF-8"));

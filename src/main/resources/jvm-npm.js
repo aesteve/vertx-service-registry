@@ -202,8 +202,10 @@ module = (typeof module == 'undefined') ? {} :  module;
   }
 
   function resolveAsRelativePath(id, parent){
+	  if (!parent  && workingDir)
+		  return resolveAsFile(id, removeFileName(workingDir));
 	  if (parent)
-		  return resolveAsFile(id, removeFileName(parent.id))
+		  return resolveAsFile(id, removeFileName(parent.id));
 	  return null;
   }
   
