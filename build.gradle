@@ -15,6 +15,7 @@ dependencies {
 	compile 'io.vertx:vertx-core:3.0.0-SNAPSHOT'
 	compile 'io.vertx:vertx-apex:3.0.0-SNAPSHOT'
 	compile 'commons-io:commons-io:2.4'
+    compile 'com.google.guava:guava:18.0'
 	
 	testCompile 'junit:junit:4.12'
 }

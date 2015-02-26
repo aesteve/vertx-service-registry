@@ -1,6 +1,7 @@
 body {
 	font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size:14px;
+	padding:0 20px;
 }
 
 h1 {
@@ -25,6 +26,7 @@ a, a:visited, a:active {
 	background-color:#fafafa;
 	width:100%;
 	margin-bottom:10px;
+	margin-top:10px;
 	color:#333333;
 	border:1px solid rgba(0, 0, 0, 0.05);
 	/*border-radius:4px;*/
@@ -117,4 +119,8 @@ a, a:visited, a:active {
 }
 .latest-version {
 	font-size:14px;
+}
+
+.reset {
+	clear:both;
 }

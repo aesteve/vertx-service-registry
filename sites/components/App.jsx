@@ -1,79 +1,28 @@
-/*
-var Tags = React.createClass({
-	render: function(){
+var Header = require('Header');
+var SearchBar = require('SearchBar');
+var Services = require('Services');
+
+
+var App = React.createClass({
+	render: function () {
+        // should be in getInitialState, but not working with nashorn
+        if(!this.state)
+            this.state = {};
+        var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
+        var textSearch = "";
+        if (this.state.filters && this.state.filters.text) 
+            textSearch = this.state.filters.text;
+        var sort;
+        if (this.state.filters && this.state.filters.sort)
+            sort = this.state.filters.sort;
 		return (
-			<span className="tag" click="this.removeTagFromSearch">tag</span>
-		);
-	},
-	removeTagFromSearch: function(){
-	}
-});
-*/
-
-var SearchBar = React.createClass({
-	render: function(){
-		return React.DOM.div(
-            {className:"search-bar"},
-            React.DOM.span(
-                {className:"search"},
-                React.DOM.input(
-                    {type:"text",placeholder:"Search service"}
-                ),
-                React.DOM.span(
-                    {className:"filters"},
-                    "Filters : (tags)"
-                ),
-                React.DOM.span(
-                    {className:"counters"},
-                    "5/10 services"
-                ),
-                React.DOM.div({className:"reset"},"")
-            )
-        );
-	},
-	updateMatchingServices: function(){
-		console.log("TODO");
-	}
-});
-
-var Service = React.createClass({
-    render: function(){
-        return React.DOM.div({className:"service"}, "service");
-    }
-});
-
-var Services = React.createClass({
-	render: function(){
-        var services = _.map(this.props.services, function(service){
-            return Service({service:service});
-        });
-		return React.DOM.div({className:"services"}, services);
-	}
-});
-
-
-var Header = React.createClass({
-	render: function(){
-		return React.DOM.h1({}, "Services registry");
-	}
-});
-
-
-
-var FullApp = React.createClass({
-	render: function(){
-		return React.DOM.div(
-            null,
-            Header({}),
-            SearchBar({}),
-            Services({services:this.props.services})
+            <div className="webapp">
+                <Header />
+                <SearchBar />
+                <Services services={services} />
+            </div>
         );
 	}
 });
 
-/*
-$(document).ready(function(){
-	React.render(FullApp({}), document.body);
-});
-*/
-        
+module.exports = App
