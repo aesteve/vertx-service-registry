@@ -68,6 +68,7 @@ public class ReactComponentParser {
     }
 
     public String parseComponentTree(JsonObject props) throws ComponentParsingException {
+        System.out.println("filters=" + props.getJsonObject("filters"));
         try {
             init();
         } catch (ScriptException se) {

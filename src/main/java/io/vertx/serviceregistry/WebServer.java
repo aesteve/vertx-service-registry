@@ -14,6 +14,7 @@ import io.vertx.serviceregistry.api.ApiResources;
 import io.vertx.serviceregistry.engines.JSLibrary;
 import io.vertx.serviceregistry.engines.ReactTemplateEngine;
 import io.vertx.serviceregistry.factory.ArtifactsFactory;
+import io.vertx.serviceregistry.handlers.ServicesContextHandler;
 import io.vertx.serviceregistry.handlers.errors.DevErrorHandler;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class WebServer implements Verticle {
     private String dataDir;
     private HttpServerOptions options;
     private ReactTemplateEngine engine;
+    private ServicesContextHandler servicesContextHandler;
     private Vertx vertx;
 
     @Override
@@ -38,6 +40,7 @@ public class WebServer implements Verticle {
         Collection<JSLibrary> customLibs = new ArrayList<JSLibrary>();
         customLibs.add(new JSLibrary("webroots/scripts/libs/underscore-1.7.0.min.js", "/assets/scripts/libs/underscore-1.7.0.min.js"));
         engine = new ReactTemplateEngine("webapp-tpl.html", "C:/Dev/Tests/react/", customLibs);
+        servicesContextHandler = new ServicesContextHandler();
 
         Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "export.json");
         ArtifactsFactory.load(b.toString("UTF-8"));
@@ -55,10 +58,7 @@ public class WebServer implements Verticle {
             ApiResources.serveResource(routingContext.request());
         });
 
-        router.route("/").handler(context -> {
-            context.put("services", ArtifactsFactory.artifacts);
-            context.next();
-        });
+        router.route("/").handler(servicesContextHandler);
 
         router.get("/").handler(TemplateHandler.create(engine, "", "text/html"));
         // router.get("/").handler(requestHandler -> {
