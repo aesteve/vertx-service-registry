@@ -89,16 +89,22 @@ public class PaginationContext {
 		return links;
 	}
 
+	// FIXME : refactor that in a cleaner way once I'm not tired as hell
 	private String pageUrl(HttpServerRequest request, int pageNum, String rel) {
-		String firstParamSeparator = "&";
-		if (request.params().isEmpty()) {
-			firstParamSeparator = "?";
-		}
 		StringBuilder sb = new StringBuilder("<");
-		sb.append(request.absoluteURI());
-		sb.append(firstParamSeparator);
-		sb.append(CURRENT_PAGE_QUERY_PARAM + "=" + pageNum);
-		sb.append(PER_PAGE_QUERY_PARAM + "=" + itemsPerPage);
+		String url = request.absoluteURI();
+		if (request.params().isEmpty()) {
+			url += "?" + CURRENT_PAGE_QUERY_PARAM + "=" + pageNum;
+			url += "&" + PER_PAGE_QUERY_PARAM + "=" + itemsPerPage;
+		} else {
+			if (url.indexOf(CURRENT_PAGE_QUERY_PARAM + "=") > url.indexOf("?")) {
+				url = url.replaceAll(CURRENT_PAGE_QUERY_PARAM + "=([^&]+)", CURRENT_PAGE_QUERY_PARAM + "=" + pageNum);
+			}
+			if (url.indexOf("&" + PER_PAGE_QUERY_PARAM) == -1 && url.indexOf("?" + PER_PAGE_QUERY_PARAM) == -1) {
+				url += "&" + PER_PAGE_QUERY_PARAM + "=" + itemsPerPage;
+			}
+		}
+		sb.append(url);
 		sb.append(">; ");
 		sb.append("rel=\"" + rel + "\"");
 		return sb.toString();

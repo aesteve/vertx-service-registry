@@ -126,7 +126,8 @@ public class PaginationTest extends ServiceRegistryTestBase {
 			assertFalse(first.equals(prev));
 			assertFalse(next.equals(last));
 			links.forEach((rel, link) -> {
-				// rel.
+				assertTrue(perPageIsPreserved(perPage, link));
+				assertTrue(pageIsPreserved(link));
 			});
 
 			testComplete();
@@ -145,5 +146,18 @@ public class PaginationTest extends ServiceRegistryTestBase {
 			relLinks.put(rel.trim(), url);
 		}
 		return relLinks;
+	}
+
+	private boolean perPageIsPreserved(int perPage, String link) {
+		String queryParam = "perPage=" + perPage;
+		return link.indexOf(queryParam) > link.indexOf("?") && // is in the query params
+				link.indexOf(queryParam) == link.lastIndexOf(queryParam); // has replaced the old value, not foolishly appended
+
+	}
+
+	private boolean pageIsPreserved(String link) {
+		String queryParam = "page=";
+		return link.indexOf(queryParam) > link.indexOf("?") && // is in the query params
+				link.indexOf(queryParam) == link.lastIndexOf(queryParam); // has replaced the old value, not foolishly appended
 	}
 }
