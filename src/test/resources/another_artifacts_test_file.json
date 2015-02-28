@@ -1,0 +1,44 @@
+[
+    {
+        "availablePackages": [
+            "-mod.zip"
+        ],
+        "md5": "c43b335e993df186bc9922df4f4ac03a",
+        "groupId": "io.vertx",
+        "complementaryInfos": {
+            "author": "Joern Bernhardt",
+            "description": "The Vert.x Module Registry. This maintains a searchable directory of Vert.x modules for use by the Vert.x community",
+            "developers": [
+                "purplefox"
+            ],
+            "homepage": "https://github.com/vert-x/vertx-module-registry",
+            "keywords": [
+                "registry",
+                "directory",
+                "catalogue",
+                "catalog",
+                "modules",
+                "repository",
+                "search",
+                "list",
+                "yellow pages"
+            ],
+            "licenses": [
+                "The Apache Software License Version 2.0"
+            ],
+            "main": "io.vertx.modreg.ModuleRegistryStarter"
+        },
+        "tags": null,
+        "versions": [
+            {
+                "timestamp": 1372845512000,
+                "name": "1.0.0-beta2"
+            },
+            {
+                "timestamp": 1373359873000,
+                "name": "1.0.0-beta3"
+            }
+        ],
+        "artifactId": "module-registry"
+    }
+]

@@ -1,6 +1,8 @@
 package io.vertx.serviceregistry.model;
 
-public class Version implements Comparable<Version> {
+import io.vertx.core.json.JsonObject;
+
+public class Version implements Comparable<Version>, ApiObject {
 	public String name;
 	public Long timestamp;
 
@@ -17,5 +19,13 @@ public class Version implements Comparable<Version> {
 	@Override
 	public String toString() {
 		return this.name;
+	}
+
+	@Override
+	public JsonObject toJsonObject() {
+		JsonObject json = new JsonObject();
+		json.put("name", name);
+		json.put("timestamp", timestamp);
+		return json;
 	}
 }

@@ -1,12 +1,17 @@
 package io.vertx.serviceregistry.model;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Artifact {
+// TODO : cleanUp and reafactor (fromExport in a specific marshaller)
+// distributions ? are they used ? 
+// + getters/setters (or is it really evil ?)
+public class Artifact implements ApiObject {
 	enum Dists {
 		MOD("-mod.zip"), JAR(".jar");
 
@@ -30,6 +35,13 @@ public class Artifact {
 	public List<String> availablePackages;
 	public Map<String, String> complementaryInfos;
 
+	public Artifact() {
+		versions = new ArrayList<Version>();
+		tags = new ArrayList<String>();
+		availablePackages = new ArrayList<String>();
+		complementaryInfos = new HashMap<String, String>();
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Artifact fromExport(JsonObject json) {
 		Artifact art = new Artifact();
@@ -48,5 +60,20 @@ public class Artifact {
 		});
 
 		return art;
+	}
+
+	@Override
+	public JsonObject toJsonObject() {
+		JsonObject json = new JsonObject();
+		json.put("groupId", groupId);
+		json.put("artifactId", artifactId);
+		JsonArray versions = new JsonArray();
+		this.versions.forEach(version -> versions.add(version.toJsonObject()));
+		json.put("versions", versions);
+		json.put("tags", new JsonArray(this.tags));
+		json.put("md5", md5);
+		json.put("availablePackages", this.availablePackages);
+		json.put("complementaryInfos", complementaryInfos);
+		return json;
 	}
 }

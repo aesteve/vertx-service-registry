@@ -14,9 +14,19 @@ dependencies {
     // vertx
 	compile 'io.vertx:vertx-core:3.0.0-SNAPSHOT'
 	compile 'io.vertx:vertx-apex:3.0.0-SNAPSHOT'
+	
+	// utils
 	compile 'commons-io:commons-io:2.4'
     compile 'com.google.guava:guava:18.0'
+	compile 'commons-httpclient:commons-httpclient:3.1'
 	
+	// logging
+	compile 'ch.qos.logback:logback-classic:1.1.2'
+	compile 'ch.qos.logback:logback-core:1.1.2'
+	compile 'org.codehaus.groovy:groovy-all:2.4.1'
+
+	// tests
+	testCompile group: 'io.vertx', name: 'vertx-core', version: '3.0.0-SNAPSHOT', classifier: 'tests'
 	testCompile 'junit:junit:4.12'
 }
 
