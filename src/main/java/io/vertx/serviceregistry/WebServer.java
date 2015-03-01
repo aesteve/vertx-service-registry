@@ -16,9 +16,9 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.apex.Router;
 import io.vertx.ext.apex.handler.StaticHandler;
+import io.vertx.ext.apex.handler.TemplateHandler;
 import io.vertx.serviceregistry.dao.ArtifactsDAO;
 import io.vertx.serviceregistry.dao.impl.JsonArtifactsDAO;
-import io.vertx.serviceregistry.engines.JSLibrary;
 import io.vertx.serviceregistry.engines.ReactTemplateEngine;
 import io.vertx.serviceregistry.handlers.ServicesContextHandler;
 import io.vertx.serviceregistry.handlers.api.ServicesApiHandler;
@@ -26,9 +26,6 @@ import io.vertx.serviceregistry.handlers.errors.ApiErrorHandler;
 import io.vertx.serviceregistry.handlers.errors.DevErrorHandler;
 import io.vertx.serviceregistry.http.etag.ETagCachingService;
 import io.vertx.serviceregistry.http.etag.impl.InMemoryETagCachingService;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class WebServer implements Verticle {
 
@@ -75,7 +72,7 @@ public class WebServer implements Verticle {
 		router.mountSubRouter("/api/2", apiRouter);
 
 		router.route("/").handler(servicesContextHandler);
-		// router.get("/").handler(TemplateHandler.create(engine, "", "text/html"));
+		router.get("/sites").handler(TemplateHandler.create(engine, "", "text/html"));
 		router.get("/").handler(request -> request.response().sendFile("sites/index.html"));
 		router.get("/").failureHandler(new DevErrorHandler("error.html"));
 
@@ -156,10 +153,7 @@ public class WebServer implements Verticle {
 		// Pages-related (context, paths)
 		servicesContextHandler = new ServicesContextHandler(artifactsDAO);
 
-		// Javascript + server-side rendering
-		Collection<JSLibrary> customLibs = new ArrayList<JSLibrary>();
-		customLibs.add(new JSLibrary("webroots/scripts/libs/underscore-1.7.0.min.js", "/assets/scripts/libs/underscore-1.7.0.min.js"));
-		engine = new ReactTemplateEngine("webapp-tpl.html", "C:/Dev/Tests/react/", customLibs);
+		engine = new ReactTemplateEngine("server-index.html");
 
 		// Api
 		eTagCachingService = new InMemoryETagCachingService();

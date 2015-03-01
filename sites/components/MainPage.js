@@ -5,6 +5,8 @@ var Services = require('./Services');
 var Pagination = require('./Pagination');
 var BackToTop = require('./BackToTop');
 var ServicesCollection = require('../model/ServicesCollection');
+var _ = require('underscore');
+
 
 var DEFAULT_API_VERSION = 2;
 
@@ -13,7 +15,6 @@ var servicesCollection = new ServicesCollection(DEFAULT_API_VERSION);
 var App = React.createClass({
     getInitialState: function(){
         return {
-            services:this.props.services,
             fetchInProgress: false,
             filters:{
                 textSearch:"",
@@ -24,10 +25,17 @@ var App = React.createClass({
         };
     },
     componentDidMount: function(){
+        if (this.props.services) {
+            return;
+        }
         this.fetchServices();
     },
 	render: function () {
         var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
+        console.log("services:");
+        _.each(this.props, function(prop){
+            console.log(prop);
+        });
 		return (
             <div className="webapp">
                 <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />
