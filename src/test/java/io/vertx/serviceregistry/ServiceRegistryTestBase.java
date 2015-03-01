@@ -26,6 +26,10 @@ public class ServiceRegistryTestBase extends VertxTestBase {
 		return "artifacts_test.json";
 	}
 
+	public String getTestFileOnFs() {
+		return "src/test/resources/" + getTestFile();
+	}
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

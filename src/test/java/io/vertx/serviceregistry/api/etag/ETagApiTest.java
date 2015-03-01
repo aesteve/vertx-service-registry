@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class ETagApiTest extends ServiceRegistryTestBase {
 
-	public static final String TEST_DATA_ETAG = "c4e1f2097d0e89083a8ce3aa6e9a7722";
+	public static final String TEST_DATA_ETAG = "50fb9692cffd5b61afc73ea5d41b08fe";
 
 	@Test
 	public void eTagIsSentAndCorrect() throws Exception {

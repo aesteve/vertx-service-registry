@@ -135,6 +135,63 @@ public class PaginationTest extends ServiceRegistryTestBase {
 		await();
 	}
 
+	@Test
+	public void linkHeadersOnFirstPage() throws Exception {
+		int perPage = 10;
+		// the first artifactId (in file) is 0 :
+		// -> the first on page 3 must be 20
+		// -> the last on page 3 must be 29
+		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage, request -> {
+			request.headers().add("Accept", "application/json");
+		}, response -> {
+			assertTrue(response.headers().contains("Link"));
+			String linkHeader = response.headers().get("Link");
+			Map<String, String> links = parseLinkHeader(linkHeader);
+			assertEquals(2, links.size());
+			String next = links.get("next");
+			String last = links.get("last");
+			assertNotNull(next);
+			assertNotNull(last);
+			assertFalse(next.equals(last));
+			links.forEach((rel, link) -> {
+				assertTrue(perPageIsPreserved(perPage, link));
+				assertTrue(pageIsPreserved(link));
+			});
+
+			testComplete();
+		}, 200, "OK", null);
+		await();
+	}
+
+	@Test
+	public void linkHeadersOnLastPage() throws Exception {
+		int perPage = 10;
+		int page = 12;
+		// the first artifactId (in file) is 0 :
+		// -> the first on page 3 must be 20
+		// -> the last on page 3 must be 29
+		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage + "&page=" + page, request -> {
+			request.headers().add("Accept", "application/json");
+		}, response -> {
+			assertTrue(response.headers().contains("Link"));
+			String linkHeader = response.headers().get("Link");
+			Map<String, String> links = parseLinkHeader(linkHeader);
+			assertEquals(2, links.size());
+			String first = links.get("first");
+			String prev = links.get("prev");
+			assertNotNull(first);
+			assertNotNull(prev);
+			assertFalse(first.equals(prev));
+			links.forEach((rel, link) -> {
+				assertTrue(perPageIsPreserved(perPage, link));
+				assertTrue(pageIsPreserved(link));
+			});
+
+			testComplete();
+		}, 200, "OK", null);
+		await();
+	}
+
 	private Map<String, String> parseLinkHeader(String link) {
 		Map<String, String> relLinks = new HashMap<String, String>();
 		String[] rawLinks = link.split(",");

@@ -2,6 +2,8 @@ package io.vertx.serviceregistry.model;
 
 import io.vertx.core.json.JsonObject;
 
+import java.util.Map;
+
 public class Version implements Comparable<Version>, ApiObject {
 	public String name;
 	public Long timestamp;
@@ -19,6 +21,12 @@ public class Version implements Comparable<Version>, ApiObject {
 	@Override
 	public String toString() {
 		return this.name;
+	}
+
+	public static Version fromMap(Map<String, Object> map) {
+		String name = (String) map.get("name");
+		Long timestamp = (Long) map.get("timestamp");
+		return new Version(name, timestamp);
 	}
 
 	@Override

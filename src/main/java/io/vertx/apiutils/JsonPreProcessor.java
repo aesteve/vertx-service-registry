@@ -17,6 +17,7 @@ public class JsonPreProcessor implements Handler<RoutingContext> {
 		if (!acceptsJson(requestHeaders)) {
 			context.response().setStatusCode(HttpStatus.SC_NOT_ACCEPTABLE);
 			context.fail(HttpStatus.SC_NOT_ACCEPTABLE);
+			return;
 		}
 		context.next();
 	}

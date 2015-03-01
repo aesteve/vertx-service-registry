@@ -17,9 +17,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.apex.Router;
 import io.vertx.ext.apex.handler.StaticHandler;
 import io.vertx.ext.apex.handler.TemplateHandler;
+import io.vertx.serviceregistry.dao.ArtifactsDAO;
+import io.vertx.serviceregistry.dao.impl.JsonArtifactsDAO;
 import io.vertx.serviceregistry.engines.JSLibrary;
 import io.vertx.serviceregistry.engines.ReactTemplateEngine;
-import io.vertx.serviceregistry.factory.ArtifactsFactory;
 import io.vertx.serviceregistry.handlers.ServicesContextHandler;
 import io.vertx.serviceregistry.handlers.api.ServicesApiHandler;
 import io.vertx.serviceregistry.handlers.errors.ApiErrorHandler;
@@ -46,6 +47,7 @@ public class WebServer implements Verticle {
 	private ReactTemplateEngine engine;
 	private ServicesContextHandler servicesContextHandler; // TODO : rename as something related to "injects queryParams into context"
 	private ServicesApiHandler servicesApiHandler;
+	private ArtifactsDAO artifactsDAO;
 	private Vertx vertx;
 	private ETagCachingService eTagCachingService;
 
@@ -64,7 +66,8 @@ public class WebServer implements Verticle {
 		apiRouter.route().handler(new PaginationPreProcessor());
 		apiRouter.route().handler(new ETagPreProcessor(eTagCachingService));
 		// data-processing
-		apiRouter.get("/services").handler(servicesApiHandler);
+		apiRouter.getWithRegex("/services(/|$)").handler(servicesApiHandler);
+		apiRouter.get("/services/:serviceId").handler(servicesApiHandler);
 		// post-processing
 		apiRouter.route().handler(new PaginationPostProcessor());
 		apiRouter.route().handler(new ETagPostProcessor(eTagCachingService));
@@ -145,9 +148,13 @@ public class WebServer implements Verticle {
 		this.config = context.config();
 
 		checkConfig();
+		// Load artifacts from FS
+		Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "/" + artifactsFile);
+		artifactsDAO = new JsonArtifactsDAO(b.toString("UTF-8"));
+		artifactsDAO.load();
 
 		// Pages-related (context, paths)
-		servicesContextHandler = new ServicesContextHandler();
+		servicesContextHandler = new ServicesContextHandler(artifactsDAO);
 
 		// Javascript + server-side rendering
 		Collection<JSLibrary> customLibs = new ArrayList<JSLibrary>();
@@ -155,9 +162,7 @@ public class WebServer implements Verticle {
 		engine = new ReactTemplateEngine("webapp-tpl.html", "C:/Dev/Tests/react/", customLibs);
 
 		// Api
-		Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "/" + artifactsFile);
-		ArtifactsFactory.load(b.toString("UTF-8"));
 		eTagCachingService = new InMemoryETagCachingService();
-		servicesApiHandler = new ServicesApiHandler();
+		servicesApiHandler = new ServicesApiHandler(artifactsDAO);
 	}
 }

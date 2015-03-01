@@ -99,6 +99,8 @@ public class PaginationContext {
 		} else {
 			if (url.indexOf(CURRENT_PAGE_QUERY_PARAM + "=") > url.indexOf("?")) {
 				url = url.replaceAll(CURRENT_PAGE_QUERY_PARAM + "=([^&]+)", CURRENT_PAGE_QUERY_PARAM + "=" + pageNum);
+			} else {
+				url += "&" + CURRENT_PAGE_QUERY_PARAM + "=" + pageNum;
 			}
 			if (url.indexOf("&" + PER_PAGE_QUERY_PARAM) == -1 && url.indexOf("?" + PER_PAGE_QUERY_PARAM) == -1) {
 				url += "&" + PER_PAGE_QUERY_PARAM + "=" + itemsPerPage;
