@@ -12,6 +12,7 @@ import java.util.Map;
 import org.junit.Test;
 
 public class ServiceApiTest extends ServiceRegistryTestBase {
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testStandardRequest() throws Exception {
 		JsonArray artifactsTest = new JsonArray(new String(Files.readAllBytes(Paths.get(getTestFileOnFs())), "UTF-8"));
