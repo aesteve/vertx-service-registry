@@ -34,7 +34,19 @@ public class JsonArtifactsDAO implements ArtifactsDAO {
 			return artifacts;
 		}
 		return artifacts.stream().filter(artifact -> {
-			return artifact.fullId().indexOf(criteria.textSearch) > -1;
+			if (criteria.getTextSearch() != null && !"".equals(criteria.getTextSearch())) {
+				if (artifact.fullId().indexOf(criteria.getTextSearch()) == -1) {
+					return false;
+				}
+			}
+			if (criteria.getTags() != null && criteria.getTags().size() > 0) {
+				if (artifact.getTags() == null || artifact.getTags().size() == 0) {
+					return false;
+				}
+				// if the intersection of both list is not empty
+				return criteria.getTags().retainAll(artifact.getTags());
+			}
+			return true;
 		}).collect(Collectors.toList());
 	}
 

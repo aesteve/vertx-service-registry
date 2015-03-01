@@ -13,7 +13,7 @@ public class NoCollisionETagTest extends ServiceRegistryTestBase {
 
 	@Test
 	public void eTagIsDifferent() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			assertNotNull(response.headers().get("ETag"));

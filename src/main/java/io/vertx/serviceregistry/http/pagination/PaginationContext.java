@@ -93,7 +93,7 @@ public class PaginationContext {
 	private String pageUrl(HttpServerRequest request, int pageNum, String rel) {
 		StringBuilder sb = new StringBuilder("<");
 		String url = request.absoluteURI();
-		if (request.params().isEmpty()) {
+		if (url.indexOf("?") == -1) { // can't rely on params() 'cause we might have injected some stuff (routing)
 			url += "?" + CURRENT_PAGE_QUERY_PARAM + "=" + pageNum;
 			url += "&" + PER_PAGE_QUERY_PARAM + "=" + itemsPerPage;
 		} else {

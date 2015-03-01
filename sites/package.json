@@ -2,10 +2,11 @@
     "main":"components/App.js",
 	"devDependencies":{
 		"react":"^0.12.2",
-		"node-jsx":"*",
+		"node-jsx":"^0.12.4",
         "jquery":"^2.1.1",
         "watchify":"^2.4.0",
-        "statics": "~0.1.0",
-        "underscore":"*"
+        "statics": "^0.1.0",
+        "underscore":"^1.8.2",
+        "moment":"^2.9.0"
 	}
 }

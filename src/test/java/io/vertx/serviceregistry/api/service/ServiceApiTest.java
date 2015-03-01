@@ -18,7 +18,7 @@ public class ServiceApiTest extends ServiceRegistryTestBase {
 		JsonArray artifactsTest = new JsonArray(new String(Files.readAllBytes(Paths.get(getTestFileOnFs())), "UTF-8"));
 		Map<String, Object> artifact = (Map<String, Object>) artifactsTest.getList().get(0);
 		String serviceId = (String) artifact.get("groupId") + ":" + (String) artifact.get("artifactId");
-		testRequest(HttpMethod.GET, "/api/1/services/" + serviceId, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "/" + serviceId, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {

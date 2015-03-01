@@ -25,14 +25,11 @@ public class ServicesApiHandler implements Handler<RoutingContext> {
 	public void handle(RoutingContext context) {
 		String serviceId = context.request().getParam("serviceId");
 		if (serviceId == null) {
-			JsonArray payload = getServices(context, null);
+			JsonArray payload = getServices(context, SearchCriteria.fromApiRequest(context.request()));
 			if (payload != null) {
 				context.data().put("payload", payload);
 				context.next();
 			}
-		} else if (serviceId.equals("search")) {
-			SearchCriteria criteria = SearchCriteria.fromApiRequest(context.request());
-			getServices(context, criteria);
 		} else {
 			JsonObject payload = getService(context, serviceId);
 			if (payload != null) {
@@ -45,10 +42,9 @@ public class ServicesApiHandler implements Handler<RoutingContext> {
 	private JsonArray getServices(RoutingContext context, SearchCriteria criteria) {
 		PaginationContext paginationContext = (PaginationContext) context.data().get("paginationContext");
 		if (paginationContext == null) {
-			return new JsonArray(dao.getMatchingArtifacts(null));
+			return new JsonArray(dao.getMatchingArtifacts(criteria));
 		}
-		// TODO : analyse search criteria
-		List<Artifact> matchingArtifacts = dao.getMatchingArtifacts(null);
+		List<Artifact> matchingArtifacts = dao.getMatchingArtifacts(criteria);
 		paginationContext.setNbItems(matchingArtifacts.size());
 		int lowerBound = paginationContext.firstItemInPage();
 		if (lowerBound > matchingArtifacts.size()) {

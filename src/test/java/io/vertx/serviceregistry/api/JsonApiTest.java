@@ -21,12 +21,12 @@ public class JsonApiTest extends ServiceRegistryTestBase {
 
 	@Test
 	public void testNoAcceptHeader() throws Exception {
-		testGetStatus("/api/1/services", 406, "Not Acceptable");
+		testGetStatus(SERVICES_API, 406, "Not Acceptable");
 	}
 
 	@Test
 	public void testStandardRequest() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API, request -> {
 			request.headers().add("Accept", "application/json");
 		}, null, 200, "OK", null);
 	}

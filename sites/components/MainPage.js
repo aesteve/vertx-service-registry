@@ -3,9 +3,12 @@ var React = require('react');
 var SearchBar = require('./SearchBar');
 var Services = require('./Services');
 var Pagination = require('./Pagination');
+var BackToTop = require('./BackToTop');
 var ServicesCollection = require('../model/ServicesCollection');
 
-var servicesCollection = new ServicesCollection();
+var DEFAULT_API_VERSION = 2;
+
+var servicesCollection = new ServicesCollection(DEFAULT_API_VERSION);
 
 var App = React.createClass({
     getInitialState: function(){
@@ -16,7 +19,8 @@ var App = React.createClass({
                 textSearch:"",
                 tags:[],
                 sort:undefined
-            }
+            },
+            apiVersion:servicesCollection.apiVersion
         };
     },
     componentDidMount: function(){
@@ -26,10 +30,11 @@ var App = React.createClass({
         var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
 		return (
             <div className="webapp">
-                <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} />
-                <Pagination pagination={servicesCollection.pagination} />
+                <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />
+                <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
                 <Services services={services} />
-                <Pagination pagination={servicesCollection.pagination} />
+                <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
+                <BackToTop />
             </div>
         );
 	},
@@ -44,10 +49,31 @@ var App = React.createClass({
         this.setState({matchingServices:servicesCollection.currentPageServices, fetchInProgress:false});
     },
     filtersChanged: function(newFilters){
-        console.log(newFilters);
         var instance_ = this;
-        this.setState({filters:newFilters});
-        this.fetchServices();
+        servicesCollection.reset();
+        this.setState({filters:newFilters}, function(){
+            instance_.fetchServices();
+        });
+    },
+    navigate: function(rel){
+        var instance_ = this;
+        this.setState({fetchInProgress:true});
+        servicesCollection.goTo(rel).done(function(){
+            instance_.refreshServicesList();
+        });
+    },
+    apiVersionChanged: function(apiVersion){
+        servicesCollection.setApiVersion(apiVersion);
+        servicesCollection.reset();
+        var instance_ = this;
+        this.setState({apiVersion:apiVersion, filters:{textSearch:"", tags:[], sort:undefined}}, function(){
+            servicesCollection.filters = instance_.state.filters;
+            if (apiVersion == 3)
+                alert("NIY");
+            servicesCollection.fetch().always(function(){
+                instance_.refreshServicesList();
+            });
+        });
     }
 });
 

@@ -10,18 +10,22 @@ var ServiceFoot = require ('./ServiceFoot');
 
 
 var Service = React.createClass({
+    getInitialState: function(){
+        return {
+            expanded: false
+        }
+    },
     render: function(){
-        // should be in getInitialState, but not working with nashorn
-        if(!this.state)
-            this.state = {};
-        
         return (
             <div className="service">
-                <ServiceHead service={this.props.service} />
-                <ServiceContent service={this.props.service} />
-                <ServiceFoot service={this.props.service} />
+                <ServiceHead service={this.props.service} toggleService={this.toggleService} />
+                <ServiceContent service={this.props.service} expanded={this.state.expanded} />
+                <ServiceFoot service={this.props.service} expanded={this.state.expanded} />
             </div>
         );
+    },
+    toggleService:function(){
+        this.setState({expanded:!this.state.expanded});
     }
 });
 

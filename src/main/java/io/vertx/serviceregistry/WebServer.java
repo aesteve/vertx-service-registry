@@ -72,7 +72,7 @@ public class WebServer implements Verticle {
 		apiRouter.route().handler(new ETagPostProcessor(eTagCachingService));
 		apiRouter.route().handler(new JsonFinalizer());
 		apiRouter.route().failureHandler(new ApiErrorHandler());
-		router.mountSubRouter("/api/1", apiRouter);
+		router.mountSubRouter("/api/2", apiRouter);
 
 		router.route("/").handler(servicesContextHandler);
 		// router.get("/").handler(TemplateHandler.create(engine, "", "text/html"));

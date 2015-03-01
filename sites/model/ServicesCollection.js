@@ -1,33 +1,33 @@
 var _ = require('underscore');
 var $ = require('jquery');
 
-var ServicesCollection = function(){
-    this.currentPageServices = {};
-    this.pagination = {
-        current:1,
-        next:undefined,
-        prev:undefined,
-        first:undefined,
-        last:undefined
-    };
+var ServicesCollection = function(apiVersion){
+    this.apiVersion = apiVersion;
+    this.reset();
 };
 
-ServicesCollection.prototype.fetch = function(){
+ServicesCollection.prototype.fetch = function(url){
     var def = new $.Deferred();
     var instance_ = this;
-    $.ajax("/api/1/services/", {
-        beforeSend:function(xhr){
-            var filters = instance_.filters;
-            if (!filters)
-                return;
-            if (instance_.filters.textSearch) {
-                xhr.setRequestHeader("q",encodeURIComponent(instance_.filters.textSearch));
+    var getQueryParams = function(){
+        var params = {};
+        var filters = instance_.filters;
+        if (filters) {
+            if (filters.textSearch) {
+                params['q'] = encodeURIComponent(filters.textSearch);
             }
-            var tags = instance_.filters.tags;
-            if (tags) {
-                xhr.setRequestHeader("tags", encodeURIComponent(tags.join(",")));
+            var tags = filters.tags;
+            if (tags && tags.length > 0) {
+                params['tags'] = encodeURIComponent(tags.join(","));
             }
-        },
+        }
+        params.page=instance_.pagination.current;
+        params.perPage=30;
+        return params;
+    };
+    var url = "/api/"+this.apiVersion+"/services/";
+    $.ajax(url, {
+        data:getQueryParams(),
         method:"GET",
         dataType:"json",
         contentType:"application/json",
@@ -38,14 +38,25 @@ ServicesCollection.prototype.fetch = function(){
         },
         error:function(jqXhr, statusMsg, error){
             console.error(statusMsg);
+            def.reject(error);
         }
     });
     return def;
 };
 
+ServicesCollection.prototype.setApiVersion = function(apiVersion){
+    this.apiVersion = apiVersion;
+};
+
 ServicesCollection.prototype.parseLinkHeader = function(header){
-    if (header.length == 0) {
-        throw new Error("input must not be of zero length");
+    if (!header || header.length == 0) {
+        this.pagination.current = 1;
+        this.pagination.next = undefined;
+        this.pagination.prev = undefined;
+        this.pagination.last = undefined;
+        this.pagination.first = undefined;
+        
+        return;
     }
 
     var parts = header.split(',');
@@ -63,6 +74,38 @@ ServicesCollection.prototype.parseLinkHeader = function(header){
     var currentPage = this.pagination.current;
     this.pagination = links;
     this.pagination.current = currentPage;
+    if (this.pagination.last){
+        console.log("set pagination total : "+this.getParamValue(this.pagination.last, "page"));
+        this.pagination.total = this.getParamValue(this.pagination.last, "page");
+    } else {
+        this.pagination.total = 1;
+    }
+};
+
+ServicesCollection.prototype.goTo = function(rel){
+    var url = this.pagination[rel];
+    var page = this.getParamValue(url, "page");
+    this.pagination.current = page;
+    return this.fetch();
+};
+
+ServicesCollection.prototype.getParamValue = function(url, name){
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(url);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
+ServicesCollection.prototype.reset = function(){
+    this.pagination = {
+        current:1,
+        next:undefined,
+        prev:undefined,
+        first:undefined,
+        last:undefined
+    };
+    this.filters = {};
+    this.currentPageServices = {};
 };
 
 module.exports = ServicesCollection;

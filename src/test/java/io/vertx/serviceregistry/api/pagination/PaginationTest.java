@@ -18,28 +18,28 @@ public class PaginationTest extends ServiceRegistryTestBase {
 
 	@Test
 	public void invalidPerPageParam() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=notAnInt", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=notAnInt", request -> {
 			request.headers().add("Accept", "application/json");
 		}, null, 400, "Bad Request", null);
 	}
 
 	@Test
 	public void perPageParamTooBig() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=10000", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=10000", request -> {
 			request.headers().add("Accept", "application/json");
 		}, null, 400, "Bad Request", null);
 	}
 
 	@Test
 	public void invalidPageParam() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services?page=notAnInt", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?page=notAnInt", request -> {
 			request.headers().add("Accept", "application/json");
 		}, null, 400, "Bad Request", null);
 	}
 
 	@Test
 	public void pageParamTooBig() throws Exception {
-		testRequest(HttpMethod.GET, "/api/1/services?page=10000", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?page=10000", request -> {
 			request.headers().add("Accept", "application/json");
 		}, null, 400, "Bad Request", null);
 	}
@@ -47,7 +47,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 	@Test
 	public void perPageParamIsRespected() throws Exception {
 		int perPage = 10;
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {
@@ -63,7 +63,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 	@Test
 	public void firstPageByDefault() throws Exception {
 		int perPage = 10;
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {
@@ -85,7 +85,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 		// the first artifactId (in file) is 0 :
 		// -> the first on page 3 must be 20
 		// -> the last on page 3 must be 29
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage + "&page=" + page, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage + "&page=" + page, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {
@@ -108,7 +108,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 		// the first artifactId (in file) is 0 :
 		// -> the first on page 3 must be 20
 		// -> the last on page 3 must be 29
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage + "&page=" + page, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage + "&page=" + page, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			assertTrue(response.headers().contains("Link"));
@@ -141,7 +141,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 		// the first artifactId (in file) is 0 :
 		// -> the first on page 3 must be 20
 		// -> the last on page 3 must be 29
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			assertTrue(response.headers().contains("Link"));
@@ -170,7 +170,7 @@ public class PaginationTest extends ServiceRegistryTestBase {
 		// the first artifactId (in file) is 0 :
 		// -> the first on page 3 must be 20
 		// -> the last on page 3 must be 29
-		testRequest(HttpMethod.GET, "/api/1/services?perPage=" + perPage + "&page=" + page, request -> {
+		testRequest(HttpMethod.GET, SERVICES_API + "?perPage=" + perPage + "&page=" + page, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			assertTrue(response.headers().contains("Link"));
@@ -199,7 +199,6 @@ public class PaginationTest extends ServiceRegistryTestBase {
 			String[] sections = rawLink.split(";");
 			String url = sections[0].replaceAll("<(.*)>", "$1");
 			String rel = sections[1].replaceAll("rel=\\\"(.*)\\\"", "$1");
-			System.out.println("[" + rel + " :|: " + url + "]");
 			relLinks.put(rel.trim(), url);
 		}
 		return relLinks;

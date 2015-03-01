@@ -4,8 +4,15 @@ var TagFoot = require('./TagFoot');
 var _ = require('underscore');
 
 var ServiceFoot = React.createClass({
+    getInitialState: function(){
+        return {
+            expanded: this.props.expanded
+        }
+    },
+    componentWillReceiveProps: function(newProps){
+        this.setState({expanded:newProps.expanded});
+    },
     render: function(){
-        
         var service = this.props.service;
         var tags = service.tags;
         var jsxTags = _.map(tags, function(tag, idx){
@@ -24,11 +31,15 @@ var ServiceFoot = React.createClass({
         }
         var versions = _.map(service.versions, function(version){
             return (
-                <Version name={version.name} />
+                <Version key={version.name} name={version.name} />
             );
         });
+        var className = "service-foot ";
+        if (!this.state.expanded) {
+            className += "hidden ";
+        }
         return (
-            <div className="service-foot">
+            <div className={className}>
                 <div className="left">
                     Tags : 
                     <ul className="flat-list no-style-type">

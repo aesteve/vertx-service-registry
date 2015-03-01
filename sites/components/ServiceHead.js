@@ -4,14 +4,10 @@ var Date = require('./Date');
 
 var ServiceHead = React.createClass({
     render: function(){
-        // FIXME : hack because getInitialState is not executed
-        if (!this.state)
-            this.state = {};
-        
         var service = this.props.service;
         var latestVersion = service.versions[service.versions.length-1];
         return (
-            <div className="service-head" click={this.toggleContent}>
+            <div className="service-head" onClick={this.toggleContent}>
                 <div className="left">
                     {service.artifactId}
                 </div>
@@ -23,7 +19,7 @@ var ServiceHead = React.createClass({
         );
     },
     toggleContent: function(){
-        this.props.toggle();
+        this.props.toggleService();
     }
 });
 

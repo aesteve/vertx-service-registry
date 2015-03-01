@@ -22,6 +22,8 @@ public class ServiceRegistryTestBase extends VertxTestBase {
 	protected HttpClient client;
 	protected String deploymentId;
 
+	protected static final String SERVICES_API = "/api/2/services";
+
 	public String getTestFile() {
 		return "artifacts_test.json";
 	}

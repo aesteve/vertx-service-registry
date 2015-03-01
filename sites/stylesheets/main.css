@@ -1,5 +1,5 @@
 body {
-	font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
 	font-size:14px;
     padding:0;
     color:#333;
@@ -21,13 +21,38 @@ a, a:visited, a:active {
 	color:#336699;
 }
 
+.fake-link:hover, .pagination-bar li.current-page a {
+    text-decoration:none;
+}
 
-section.content {
+.right-logo {
+    box-sizing:border-box;
+    height:40px;
+    padding:10px 5px;
+}
+
+.hidden {
+    display:none;
+}
+
+.big {
+    font-size:25px;
+}
+
+.bold {
+    font-weight:bold;
+}
+
+div.background {
     padding:47px 20px 0 20px;
     background:url(/assets/img/vertx_hero.png);
     background-repeat: repeat-x;
     background-attachment: fixed;
     max-height: 15px;
+}
+
+div.content {
+    padding:0px 20px 0 20px;
 }
 
 .service {
@@ -152,11 +177,14 @@ section.content {
     width:50px;
     box-sizing:content-box;
     text-align:center;
-    cursor:pointer;
     margin-top:-1px;
 }
 
-.pagination-bar li a:hover {
+.pagination-bar li.page-link a {
+    cursor:pointer;
+}
+
+.pagination-bar li.page-link a:hover {
     text-decoration:none;
     background-color:white;
 }
@@ -184,12 +212,40 @@ section.content {
     padding-left:5px;
 }
 
+footer {
+    margin-top:10px;
+    padding:10px 20px;
+    position:relative;
+    display:block;
+    width:100%;
+}
+
+footer::after {
+    content:"";
+    background:url(/assets/img/vertx_hero.png);
+    opacity:0.4;
+    position:absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index:-1;
+    border-top:5px solid transparent;
+}
+
+footer a {
+}
+
+footer a:hover {
+    text-decoration:underline;
+}
+
 header {
     margin-bottom:20px;
     position:fixed;
     width:100%;
     background:rgba(238, 238, 238, 0.7);
-    box-shadow:0px 5px 0px 0px rgba(0, 0, 0, 0.25)
+    box-shadow:0px 5px 0px 0px rgba(0, 0, 0, 0.25);
 }
 
 header nav {
@@ -219,10 +275,35 @@ header .useful-links a {
 }
 
 header .useful-links li a:hover {
-    background:rgba(238, 238, 238, 0.9);
+    background:rgba(238, 238, 238, 0.8);
+}
+
+.back-to-top {
+    position:fixed;
+    right:10px;
+    bottom:10px;
+    z-index:1000;
+}
+
+.top-link {
+    width: 50px;
+    height: 50px;
+    text-indent: -9999px;
+    display: block;
+    margin: 0;
+    background: #243446 url(http://static.jboss.org/common/images/top.png) no-repeat center center;
+}
+
+.top-link:hover {
+    background-color:#4a5d75;
 }
 
 ::-webkit-input-placeholder { font-style:italic; }
 ::-moz-placeholder { font-style:italic; } /* firefox 19+ */
 :-ms-input-placeholder { font-style:italic; } /* ie */
 input:-moz-placeholder { font-style:italic;padding-left:5px; }
+
+
+.api-switch {
+    line-height:30px;
+}

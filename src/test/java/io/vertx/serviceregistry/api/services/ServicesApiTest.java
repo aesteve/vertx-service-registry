@@ -13,7 +13,7 @@ public class ServicesApiTest extends ServiceRegistryTestBase {
 	@Test
 	public void testStandardRequest() throws Exception {
 		JsonArray artifactsTest = new JsonArray(new String(Files.readAllBytes(Paths.get(getTestFileOnFs())), "UTF-8"));
-		testRequest(HttpMethod.GET, "/api/1/services", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {
@@ -27,7 +27,7 @@ public class ServicesApiTest extends ServiceRegistryTestBase {
 	@Test
 	public void withAnEndingSlash() throws Exception {
 		JsonArray artifactsTest = new JsonArray(new String(Files.readAllBytes(Paths.get(getTestFileOnFs())), "UTF-8"));
-		testRequest(HttpMethod.GET, "/api/1/services/", request -> {
+		testRequest(HttpMethod.GET, SERVICES_API, request -> {
 			request.headers().add("Accept", "application/json");
 		}, response -> {
 			response.bodyHandler(buffer -> {
