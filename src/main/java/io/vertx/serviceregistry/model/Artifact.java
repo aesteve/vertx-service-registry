@@ -71,6 +71,7 @@ public class Artifact implements ApiObject {
 		return art;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Artifact fromMap(Map<String, Object> map) {
 		Artifact art = new Artifact();
 		art.groupId = (String) map.get("groupId");
