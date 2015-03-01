@@ -8,6 +8,7 @@ import io.vertx.serviceregistry.model.Artifact;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class JsonArtifactsDAO implements ArtifactsDAO {
 	public static List<Artifact> artifacts;
@@ -23,9 +24,18 @@ public class JsonArtifactsDAO implements ArtifactsDAO {
 		artifacts = ArtifactsMarshaller.unmarshall(array);
 	}
 
+	/**
+	 * This method belongs to the DAO since it could query something
+	 * (not in JSON implementation but in an SQL one for instance)
+	 */
 	@Override
-	public List<Artifact> getMatchingArtifacts(SearchCriteria criteria) {
-		return artifacts; // TODO : match
+	public List<Artifact> getMatchingArtifacts(final SearchCriteria criteria) {
+		if (criteria == null) {
+			return artifacts;
+		}
+		return artifacts.stream().filter(artifact -> {
+			return artifact.fullId().indexOf(criteria.textSearch) > -1;
+		}).collect(Collectors.toList());
 	}
 
 	@Override

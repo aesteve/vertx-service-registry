@@ -10,34 +10,44 @@ var servicesCollection = new ServicesCollection();
 var App = React.createClass({
     getInitialState: function(){
         return {
-            services:this.props.services
+            services:this.props.services,
+            fetchInProgress: false,
+            filters:{
+                textSearch:"",
+                tags:[],
+                sort:undefined
+            }
         };
     },
     componentDidMount: function(){
-        var instance_ = this;
-        servicesCollection.fetch().done(function(){
-            instance_.refreshServices();
-        });
+        this.fetchServices();
     },
 	render: function () {
         var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
-        var textSearch = "";
-        if (this.state.filters && this.state.filters.text) 
-            textSearch = this.state.filters.text;
-        var sort;
-        if (this.state.filters && this.state.filters.sort)
-            sort = this.state.filters.sort;
 		return (
             <div className="webapp">
-                <SearchBar />
+                <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} />
                 <Pagination pagination={servicesCollection.pagination} />
                 <Services services={services} />
                 <Pagination pagination={servicesCollection.pagination} />
             </div>
         );
 	},
-    refreshServices: function(){
-        this.setState({matchingServices:servicesCollection.currentPageServices});
+    fetchServices: function(){
+        var instance_ = this;
+        servicesCollection.filters = this.state.filters;
+        servicesCollection.fetch().done(function(){
+            instance_.refreshServicesList();
+        });
+    },
+    refreshServicesList: function(){
+        this.setState({matchingServices:servicesCollection.currentPageServices, fetchInProgress:false});
+    },
+    filtersChanged: function(newFilters){
+        console.log(newFilters);
+        var instance_ = this;
+        this.setState({filters:newFilters});
+        this.fetchServices();
     }
 });
 

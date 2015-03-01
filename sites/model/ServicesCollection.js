@@ -16,11 +16,22 @@ ServicesCollection.prototype.fetch = function(){
     var def = new $.Deferred();
     var instance_ = this;
     $.ajax("/api/1/services/", {
+        beforeSend:function(xhr){
+            var filters = instance_.filters;
+            if (!filters)
+                return;
+            if (instance_.filters.textSearch) {
+                xhr.setRequestHeader("q",encodeURIComponent(instance_.filters.textSearch));
+            }
+            var tags = instance_.filters.tags;
+            if (tags) {
+                xhr.setRequestHeader("tags", encodeURIComponent(tags.join(",")));
+            }
+        },
         method:"GET",
         dataType:"json",
         contentType:"application/json",
         success:function(data, status, xhr){
-            
             instance_.parseLinkHeader(xhr.getResponseHeader("Link"));
             instance_.currentPageServices = data;
             def.resolve();

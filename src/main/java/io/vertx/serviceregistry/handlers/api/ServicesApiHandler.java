@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.apex.RoutingContext;
 import io.vertx.serviceregistry.dao.ArtifactsDAO;
+import io.vertx.serviceregistry.filters.SearchCriteria;
 import io.vertx.serviceregistry.http.pagination.PaginationContext;
 import io.vertx.serviceregistry.model.Artifact;
 
@@ -24,11 +25,14 @@ public class ServicesApiHandler implements Handler<RoutingContext> {
 	public void handle(RoutingContext context) {
 		String serviceId = context.request().getParam("serviceId");
 		if (serviceId == null) {
-			JsonArray payload = getServices(context);
+			JsonArray payload = getServices(context, null);
 			if (payload != null) {
 				context.data().put("payload", payload);
 				context.next();
 			}
+		} else if (serviceId.equals("search")) {
+			SearchCriteria criteria = SearchCriteria.fromApiRequest(context.request());
+			getServices(context, criteria);
 		} else {
 			JsonObject payload = getService(context, serviceId);
 			if (payload != null) {
@@ -38,7 +42,7 @@ public class ServicesApiHandler implements Handler<RoutingContext> {
 		}
 	}
 
-	private JsonArray getServices(RoutingContext context) {
+	private JsonArray getServices(RoutingContext context, SearchCriteria criteria) {
 		PaginationContext paginationContext = (PaginationContext) context.data().get("paginationContext");
 		if (paginationContext == null) {
 			return new JsonArray(dao.getMatchingArtifacts(null));
