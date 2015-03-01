@@ -1,13 +1,14 @@
 body {
 	font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size:14px;
-	padding:0 20px;
+    padding:0;
+    color:#333;
 }
 
 h1 {
 	font-size: 20px;
 	font-weight: 200;
-	color: #33a098;
+	color: #336699;
 	width:100%;
 	text-align:center;
 }
@@ -17,11 +18,18 @@ div {
 }
 
 a, a:visited, a:active {
-	color:#006DB4;
+	color:#336699;
 }
 
 
-/* Real CSS, keep it, adapt it to your needs */
+section.content {
+    padding:47px 20px 0 20px;
+    background:url(/assets/img/vertx_hero.png);
+    background-repeat: repeat-x;
+    background-attachment: fixed;
+    max-height: 15px;
+}
+
 .service {
 	background-color:#fafafa;
 	width:100%;
@@ -39,17 +47,16 @@ a, a:visited, a:active {
 .service-head {
 	border-bottom:1px solid rgba(0, 0, 0, 0.05);
 	font-size:18px;
-	color:#33a098;
+	color:#336699;
 	cursor:pointer;
 }
 
 .service-main-content {
-	font-size:16px;
+	font-size:14px;
 }
 
 .service-foot {
 	border-top:1px solid rgba(0, 0, 0, 0.05);
-
 }
 
 .no-style-type {
@@ -85,11 +92,11 @@ a, a:visited, a:active {
 
 .tag {
 	padding:4px;
-	background-color:#33a098;
+	background-color:rgba(40,85,124, 0.5);
 	color:white;
-	border-radius:1px;
+	border-radius:2px;
 	font-size:11px;
-	margin:0 2px 0 0;
+	margin:0 2px 0px 2px;
 	cursor:pointer;
 }
 .version {
@@ -97,6 +104,7 @@ a, a:visited, a:active {
 	border:1px solid #dadada;
 	margin:0px 2px;
 	font-size:12px;
+    border-radius:2px;
 	background-color:white;
 }
 
@@ -124,3 +132,97 @@ a, a:visited, a:active {
 .reset {
 	clear:both;
 }
+
+.pagination-bar {
+    margin:0;
+    margin-top:10px;
+    padding:0;
+    height:43px;
+    width:100%;
+    border:1px solid rgba(0,0,0, 0.05);
+    background-color:#fafafa;
+    border-box:box-content;
+}
+
+.pagination-bar li a {
+    padding: 0px 10px;
+    height: 40px;
+    line-height:40px;
+    float:left;
+    width:50px;
+    box-sizing:content-box;
+    text-align:center;
+    cursor:pointer;
+    margin-top:-1px;
+}
+
+.pagination-bar li a:hover {
+    text-decoration:none;
+    background-color:white;
+}
+
+
+.pagination-bar .current-page a {
+    border-top:3px solid rgba(0, 0, 0, 0.05);
+    border-left:1px solid rgba(0, 0, 0, 0.05);
+    border-right:2px solid rgba(0, 0, 0, 0.05);
+    border-bottom:none;
+    background-color:white;
+}
+
+.search-bar {
+    height:30px;
+    margin-top: 12px;
+}
+
+.search-bar .text-field {
+    height:100%;
+    display:inline-block;
+    width:300px;
+    border:1px solid #CCC;
+    margin-right:10px;
+    padding-left:5px;
+}
+
+header {
+    margin-bottom:20px;
+    position:fixed;
+    width:100%;
+    background:rgba(238, 238, 238, 0.7);
+    box-shadow:0px 5px 0px 0px rgba(0, 0, 0, 0.25)
+}
+
+header nav {
+}
+
+header .vertx-logo {
+    padding:10px 20px;
+    box-sizing:border-box;
+    height:40px;
+}
+
+header.useful-links {
+    padding:0;
+}
+
+header .useful-links li {
+    text-align:center;
+    line-height:45px;
+    height:32px;
+}
+
+header .useful-links a {
+    padding:0 20px;
+    display:inline-block;
+    text-decoration:none;
+    color:#333;
+}
+
+header .useful-links li a:hover {
+    background:rgba(238, 238, 238, 0.9);
+}
+
+::-webkit-input-placeholder { font-style:italic; }
+::-moz-placeholder { font-style:italic; } /* firefox 19+ */
+:-ms-input-placeholder { font-style:italic; } /* ie */
+input:-moz-placeholder { font-style:italic;padding-left:5px; }

@@ -1,4 +1,6 @@
-var Date = require('Date');
+var React = require('react');
+var Date = require('./Date');
+
 
 var ServiceHead = React.createClass({
     render: function(){

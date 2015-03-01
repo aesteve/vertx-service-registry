@@ -1,3 +1,6 @@
+var React = require('react');
+var _ = require('underscore');
+
 var ComplementaryInfos = React.createClass({
     render: function(){
         var infos = this.props.infos;
@@ -12,16 +15,16 @@ var ComplementaryInfos = React.createClass({
         <tfoot>
             <tr>
                 <td>Description:</td>
-                <td>{service.complementaryInfos['description']}</td>
+                <td>{infos['description']}</td>
             </tr>
             <tr>
                 <td>Author:</td>
-                <td>{service.complementaryInfos["author"]}</td>
+                <td>{infos["author"]}</td>
             </tr>
             <tr>
                 <td>Homepage:</td>
                 <td>
-                    <a href="{service.complementaryInfos['homepage']}">{service.complementaryInfos['homepage']}</a>
+                    <a href={infos['homepage']}>{infos['homepage']}</a>
                 </td>
             </tr>
             <tr>

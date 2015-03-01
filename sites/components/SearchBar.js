@@ -1,4 +1,6 @@
-var Tag = require('Tag');
+var React = require('react');
+var Tag = require('./Tag');
+var _ = require('underscore');
 
 var SearchBar = React.createClass({
 	render: function(){
@@ -13,14 +15,12 @@ var SearchBar = React.createClass({
 		return (
             <div className="search-bar">
                 <span className="search">
-                    <input type="text" placeholder="Search service" />
+                    <input className="text-field" type="text" placeholder="Search service" />
                 </span>
-                <span className="filters">
+                {filterTags && <span className="filters">
                     Filters: {tags}
-                </span>
-                <span className="counters">
-                    {this.props.nbMatchingServices}/{this.props.nbTotalServices} services
-                </span>
+                </span>}
+                <a href="javascript:void(0)">advanced</a>
                 <div className="reset"></div>
             </div>
         );

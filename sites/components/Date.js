@@ -1,3 +1,5 @@
+var React = require('react');
+
 var Date = React.createClass({
     render: function(){
         return <span className="date">{this.format()}</span>

@@ -16,7 +16,6 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.apex.Router;
 import io.vertx.ext.apex.handler.StaticHandler;
-import io.vertx.ext.apex.handler.TemplateHandler;
 import io.vertx.serviceregistry.dao.ArtifactsDAO;
 import io.vertx.serviceregistry.dao.impl.JsonArtifactsDAO;
 import io.vertx.serviceregistry.engines.JSLibrary;
@@ -76,7 +75,8 @@ public class WebServer implements Verticle {
 		router.mountSubRouter("/api/1", apiRouter);
 
 		router.route("/").handler(servicesContextHandler);
-		router.get("/").handler(TemplateHandler.create(engine, "", "text/html"));
+		// router.get("/").handler(TemplateHandler.create(engine, "", "text/html"));
+		router.get("/").handler(request -> request.response().sendFile("sites/index.html"));
 		router.get("/").failureHandler(new DevErrorHandler("error.html"));
 
 		server = vertx.createHttpServer(options);

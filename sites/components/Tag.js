@@ -1,3 +1,4 @@
+var React = require('react');
 var Tag = React.createClass({
     render: function(){
         // boilerPlate because no "getInitialState"...

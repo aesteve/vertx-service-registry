@@ -1,5 +1,7 @@
-var Version = require('version');
-var TagFoot = require('TagFoot');
+var React = require('react');
+var Version = require('./Version');
+var TagFoot = require('./TagFoot');
+var _ = require('underscore');
 
 var ServiceFoot = React.createClass({
     render: function(){

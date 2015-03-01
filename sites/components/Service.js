@@ -1,8 +1,8 @@
-// FIXME : scan for nested folders when building, so that we can require('./service/Head')
+var React = require('react');
 
-var ServiceHead = require ('ServiceHead');
-var ServiceContent = require ('ServiceContent');
-var ServiceFoot = require ('ServiceFoot');
+var ServiceHead = require ('./ServiceHead');
+var ServiceContent = require ('./ServiceContent');
+var ServiceFoot = require ('./ServiceFoot');
 
 
 

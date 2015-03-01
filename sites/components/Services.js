@@ -1,4 +1,6 @@
-var Service = require('Service');
+var React = require('react');
+var Service = require('./Service');
+var _ = require('underscore');
 
 var Services = React.createClass({
 	render: function(){
