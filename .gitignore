@@ -23,3 +23,5 @@ mods
 .vertx
 gradle.properties
 sites/node_modules
+sites/scripts/
+server.log
