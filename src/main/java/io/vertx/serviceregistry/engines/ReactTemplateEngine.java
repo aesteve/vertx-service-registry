@@ -58,6 +58,11 @@ public class ReactTemplateEngine implements TemplateEngine {
 		String fullPage = Resources.toString(url, Charsets.UTF_8);
 		// replace "content" with html
 		fullPage = fullPage.replaceAll("\\{content\\}", Matcher.quoteReplacement(html));
+		fullPage = fullPage.replaceAll("\\{scripts\\}", getScriptTags());
 		return fullPage;
+	}
+
+	private String getScriptTags() {
+		return "<script src=\"/assets/scripts/browser-bundle.js\" charset=\"UTF-8\" async></script>";
 	}
 }

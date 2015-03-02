@@ -6,5 +6,6 @@ var factory = require('./MainPage');
 
 var initialProps = {};
 var instance = factory(initialProps);
-
-React.render(instance, document.getElementById("content"));
+$(document).ready(function(){
+    React.render(instance, document.getElementById("content"));
+});

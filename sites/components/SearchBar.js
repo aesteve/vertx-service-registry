@@ -3,13 +3,6 @@ var Tag = require('./Tag');
 var _ = require('underscore');
 
 var SearchBar = React.createClass({
-    getInitialState: function(){
-        return {
-            filters:this.props.filters,
-            advanced:false,
-            apiVersion:this.props.apiVersion
-        };
-    },
     componentWillMount: function(){
         var instance_ = this;
         this.delayed = _.debounce(function(event){
@@ -17,6 +10,13 @@ var SearchBar = React.createClass({
         }, 200);
     },
 	render: function(){
+        if (!this.state) {
+            this.state = {
+                filters:this.props.filters,
+                advanced:false,
+                apiVersion:this.props.apiVersion
+            };
+        }
         var filters = this.state.filters;
         var tags = _.map(filters.tags, function(tag){
             return (<Tag tag={tag} />);

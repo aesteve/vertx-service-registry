@@ -2,20 +2,14 @@ var React = require('react');
 var ComplementaryInfos = require('./ComplementaryInfos');
 
 var ServiceContent = React.createClass({
-    getInitialState: function(){
-        return {
-            expanded: this.props.expanded
-        }
-    },
-    componentWillReceiveProps: function(newProps){
-        this.setState({
-            expanded:newProps.expanded
-        });
-    },
     render: function(){
+        var expanded = this.props.expanded;
+        if (this.state){
+            expanded = this.state.expanded;
+        }
         var service = this.props.service;
         var className = "service-main-content ";
-        if (!this.state.expanded) {
+        if (!expanded) {
             className += "hidden ";
         }
         return (

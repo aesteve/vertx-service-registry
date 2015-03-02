@@ -13,17 +13,6 @@ var DEFAULT_API_VERSION = 2;
 var servicesCollection = new ServicesCollection(DEFAULT_API_VERSION);
 
 var App = React.createClass({
-    getInitialState: function(){
-        return {
-            fetchInProgress: false,
-            filters:{
-                textSearch:"",
-                tags:[],
-                sort:undefined
-            },
-            apiVersion:servicesCollection.apiVersion
-        };
-    },
     componentDidMount: function(){
         if (this.props.services) {
             return;
@@ -31,16 +20,24 @@ var App = React.createClass({
         this.fetchServices();
     },
 	render: function () {
+        var expanded = this.props.renderedOnServer;
+        if (!this.state){
+            this.state = {
+                fetchInProgress: false,
+                filters:{
+                    textSearch:"",
+                    tags:[],
+                    sort:undefined
+                },
+                apiVersion:servicesCollection.apiVersion
+            };
+        }
         var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
-        console.log("services:");
-        _.each(this.props, function(prop){
-            console.log(prop);
-        });
 		return (
             <div className="webapp">
-                <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />
+                {!this.props.renderedOnServer && <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />}
                 <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
-                <Services services={services} />
+                <Services services={services} expanded={expanded} />
                 <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
                 <BackToTop />
             </div>

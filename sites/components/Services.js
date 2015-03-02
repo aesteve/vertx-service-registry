@@ -7,9 +7,9 @@ var Services = React.createClass({
         // should be in getInitialState, but not working with nashorn
         if(!this.state)
             this.state = {};
-        
+        var instance_ = this;
         var services = _.map(this.props.services, function(service, idx){
-            return (<Service key={"service_"+idx} service={service} />);
+            return (<Service key={"service_"+idx} service={service} expanded={instance_.props.expanded} />);
         });
         return (
             <div className="services">

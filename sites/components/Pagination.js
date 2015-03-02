@@ -2,15 +2,15 @@ var React = require('react');
 var $ = require('jquery');
 
 var Pagination = React.createClass({
-    getInitialState:function(){
-        return {
-            pagination:this.props.pagination
-        }
-    },
     componentWillReceiveProps:function(newProps){
         this.setState({pagination:newProps.pagination});
     },
     render:function(){
+        if(!this.state){
+            this.state = {
+                pagination:this.props.pagination
+            };
+        }
         var pagination = this.state.pagination;
         if (!pagination) {
             return (<div className="pagination-bar"></div>);

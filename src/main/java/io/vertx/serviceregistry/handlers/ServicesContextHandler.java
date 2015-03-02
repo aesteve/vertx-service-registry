@@ -20,7 +20,7 @@ public class ServicesContextHandler implements Handler<RoutingContext> {
 	@Override
 	public void handle(RoutingContext context) {
 		HttpServerRequest request = context.request();
-		context.put("services", ArtifactsMarshaller.marshall(dao.getMatchingArtifacts(null).subList(0, 1)));
+		context.put("services", ArtifactsMarshaller.marshall(dao.getMatchingArtifacts(null)));
 		Map<String, Object> filters = new HashMap<String, Object>();
 		String textSearch = request.getParam("search");
 		filters.put("textSearch", textSearch);

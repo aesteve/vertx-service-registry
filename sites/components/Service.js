@@ -10,22 +10,26 @@ var ServiceFoot = require ('./ServiceFoot');
 
 
 var Service = React.createClass({
-    getInitialState: function(){
-        return {
-            expanded: false
-        }
-    },
     render: function(){
+        console.log("EXPANDED MAIN = "+this.props.expanded);
+        var expanded = this.props.expanded;
+        if (this.state){
+            expanded = this.state.expanded;
+        }
         return (
             <div className="service">
                 <ServiceHead service={this.props.service} toggleService={this.toggleService} />
-                <ServiceContent service={this.props.service} expanded={this.state.expanded} />
-                <ServiceFoot service={this.props.service} expanded={this.state.expanded} />
+                <ServiceContent service={this.props.service} expanded={expanded} />
+                <ServiceFoot service={this.props.service} expanded={expanded} />
             </div>
         );
     },
     toggleService:function(){
-        this.setState({expanded:!this.state.expanded});
+        var expanded = this.props.expanded;
+        if (this.state) {
+            expanded = this.state.expanded;
+        }
+        this.setState({expanded:!expanded});
     }
 });
 

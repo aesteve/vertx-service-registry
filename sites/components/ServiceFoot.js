@@ -4,15 +4,12 @@ var TagFoot = require('./TagFoot');
 var _ = require('underscore');
 
 var ServiceFoot = React.createClass({
-    getInitialState: function(){
-        return {
-            expanded: this.props.expanded
-        }
-    },
-    componentWillReceiveProps: function(newProps){
-        this.setState({expanded:newProps.expanded});
-    },
     render: function(){
+        console.log("EXPANDED FOOT = "+this.props.expanded);
+        var expanded = this.props.expanded;
+        if (this.state){
+            expanded = this.state.expanded;
+        }
         var service = this.props.service;
         var tags = service.tags;
         var jsxTags = _.map(tags, function(tag, idx){
@@ -35,7 +32,7 @@ var ServiceFoot = React.createClass({
             );
         });
         var className = "service-foot ";
-        if (!this.state.expanded) {
+        if (!expanded) {
             className += "hidden ";
         }
         return (

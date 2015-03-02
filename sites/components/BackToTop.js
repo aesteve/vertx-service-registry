@@ -2,11 +2,6 @@ var React = require('react');
 var $ = require('jquery');
 
 var BackToTop = React.createClass({
-    getInitialState: function(){
-        return {
-            scrolled:false
-        };
-    },
     componentDidMount: function(){
         $('<img src="http://static.jboss.org/common/images/top.png" />').load(); // preload
         var instance_ = this;
@@ -17,6 +12,9 @@ var BackToTop = React.createClass({
         });
     },
     render:function(){
+        if (!this.state){
+            this.state = {scrolled:false};
+        }
         var className = "back-to-top ";
         if (!this.state.scrolled){
             className+= "hidden";

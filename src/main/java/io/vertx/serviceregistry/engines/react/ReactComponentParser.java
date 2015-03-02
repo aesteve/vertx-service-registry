@@ -33,6 +33,7 @@ public class ReactComponentParser {
 		ScriptContext ctx = nashorn.getContext();
 		bindings = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("reactRenderedResult", "");
+		bindings.put("process", "{}");
 		bindings.put("console", "{}");
 		bindings.put("utils", "{}");
 		nashorn.eval(ScriptsResolver.getScriptFromClasspath("console.js"));
@@ -46,13 +47,10 @@ public class ReactComponentParser {
 		}
 
 		try {
-			nashorn.eval("initialProps = {}");
-			System.out.println(props.get("services").getClass());
-			JsonArray array = (JsonArray) props.get("services");
-			bindings.put("services", array.encode());
-			nashorn.eval("initialProps.services = JSON.parse(services);");
+			JsonArray list = (JsonArray) props.get("services");
+			bindings.put("nashorn_services", list);
 			nashorn.eval(ScriptsResolver.getScriptReaderFromFile(rootComponentFile));
-			return (String) bindings.get("reactRenderedResult");
+			return bindings.get("reactRenderedResult").toString();
 		} catch (FileNotFoundException | ScriptException e) {
 			throw new ComponentParsingException(e);
 		}
