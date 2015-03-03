@@ -5,6 +5,7 @@ var initialProps = {};
 process = {env:{}};
 initialProps.services = JSON.parse(nashorn_services.encode());
 initialProps.renderedOnServer = true;
+initialProps.pagination = JSON.parse(paginationContext.encode());
 var instance = factory(initialProps);
 
-reactRenderedResult = React.renderToString(instance);
+reactRenderedResult = React.renderToStaticMarkup(instance);

@@ -11,7 +11,6 @@ var ServiceFoot = require ('./ServiceFoot');
 
 var Service = React.createClass({
     render: function(){
-        console.log("EXPANDED MAIN = "+this.props.expanded);
         var expanded = this.props.expanded;
         if (this.state){
             expanded = this.state.expanded;

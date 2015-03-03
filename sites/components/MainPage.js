@@ -17,6 +17,7 @@ var App = React.createClass({
         if (this.props.services) {
             return;
         }
+        servicesCollection.setCurrentFromUrl();
         this.fetchServices();
     },
 	render: function () {
@@ -33,18 +34,20 @@ var App = React.createClass({
             };
         }
         var services = this.state.matchingServices || this.props.matchingServices || this.props.services;
+        var pagination = this.props.pagination || servicesCollection.pagination;
 		return (
             <div className="webapp">
-                {!this.props.renderedOnServer && <SearchBar filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />}
-                <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
+                {!this.props.renderedOnServer && <SearchBar fetchInProgress={this.state.fetchInProgress} filters={this.state.filters} filtersChanged={this.filtersChanged} apiVersion={this.state.apiVersion} apiVersionChanged={this.apiVersionChanged} />}
+                <Pagination navigate={this.navigate} pagination={pagination} />
                 <Services services={services} expanded={expanded} />
-                <Pagination navigate={this.navigate} pagination={servicesCollection.pagination} />
+                <Pagination navigate={this.navigate} pagination={pagination} />
                 <BackToTop />
             </div>
         );
 	},
     fetchServices: function(){
         var instance_ = this;
+        this.setState({fetchInProgress:true});
         servicesCollection.filters = this.state.filters;
         servicesCollection.fetch().done(function(){
             instance_.refreshServicesList();

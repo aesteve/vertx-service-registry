@@ -5,6 +5,8 @@
 		"node-jsx":"^0.12.4",
         "jquery":"^2.1.1",
         "watchify":"^2.4.0",
+        "browserify":"^9.0.3",
+        "reactify":"^1.0.0",
         "statics": "^0.1.0",
         "underscore":"^1.8.2",
         "moment":"^2.9.0",

@@ -1,6 +1,7 @@
 var React = require('react');
-var Tag = require('./Tag');
 var _ = require('underscore');
+var Tag = require('./Tag');
+var Loader = require('./Loader');
 
 var SearchBar = React.createClass({
     componentWillMount: function(){
@@ -9,7 +10,7 @@ var SearchBar = React.createClass({
             instance_.props.filtersChanged(instance_.state.filters);
         }, 200);
     },
-	render: function(){
+    render: function(){
         if (!this.state) {
             this.state = {
                 filters:this.props.filters,
@@ -27,6 +28,7 @@ var SearchBar = React.createClass({
             <div className="search-bar" id="search-bar">
                 <span className="search">
                     <input className="text-field" type="text" value={filters.textSearch} onChange={this.textSearchChanged} placeholder="Search service" />
+                {this.props.fetchInProgress && <Loader />}
                 </span>
                 {displayTags && <span className="filters">
                     Filters: {tags}

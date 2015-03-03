@@ -5,7 +5,6 @@ var _ = require('underscore');
 
 var ServiceFoot = React.createClass({
     render: function(){
-        console.log("EXPANDED FOOT = "+this.props.expanded);
         var expanded = this.props.expanded;
         if (this.state){
             expanded = this.state.expanded;

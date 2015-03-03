@@ -96,6 +96,10 @@ ServicesCollection.prototype.getParamValue = function(url, name){
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
+ServicesCollection.prototype.setCurrentFromUrl = function(){
+    this.pagination.current = this.getParamValue(document.location.toString(), "page") || 1 ;
+};
+
 ServicesCollection.prototype.reset = function(){
     this.pagination = {
         current:1,

@@ -12,75 +12,77 @@ import java.util.StringTokenizer;
  * @author aesteve
  */
 public class SearchCriteria {
-	private String textSearch;
-	private String sortBy;
-	private List<String> tags;
+    private String textSearch;
+    private String sortBy;
+    private List<String> tags;
 
-	private SearchCriteria() {
-	}
+    private SearchCriteria() {
+    }
 
-	public static SearchCriteria fromPageRequest(HttpServerRequest request) {
-		return null;
-	}
+    public static SearchCriteria fromPageRequest(HttpServerRequest request) {
+        // Maybe easier : same request parameters for both the apps ?
+        // We could change the parameters here if we want
+        return fromApiRequest(request);
+    }
 
-	public static SearchCriteria fromApiRequest(HttpServerRequest request) {
-		SearchCriteria criteria = new SearchCriteria();
-		criteria.textSearch = request.getParam("q");
-		String requestTags = request.getParam("tags");
-		criteria.tags = new ArrayList<String>();
-		if (requestTags != null) {
-			StringTokenizer tokenizer = new StringTokenizer(requestTags, ",");
-			while (tokenizer.hasMoreTokens()) {
-				criteria.tags.add(tokenizer.nextToken());
-			}
-		}
-		return criteria;
-	}
+    public static SearchCriteria fromApiRequest(HttpServerRequest request) {
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.textSearch = request.getParam("q");
+        String requestTags = request.getParam("tags");
+        criteria.tags = new ArrayList<String>();
+        if (requestTags != null) {
+            StringTokenizer tokenizer = new StringTokenizer(requestTags, ",");
+            while (tokenizer.hasMoreTokens()) {
+                criteria.tags.add(tokenizer.nextToken());
+            }
+        }
+        return criteria;
+    }
 
-	@Override
-	public String toString() {
-		return "criteria : [textSearch:" + textSearch + ", tags:" + tags + ",sortBy:" + sortBy + "]";
-	}
+    @Override
+    public String toString() {
+        return "criteria : [textSearch:" + textSearch + ", tags:" + tags + ",sortBy:" + sortBy + "]";
+    }
 
-	/**
-	 * @return the textSearch
-	 */
-	public String getTextSearch() {
-		return textSearch;
-	}
+    /**
+     * @return the textSearch
+     */
+    public String getTextSearch() {
+        return textSearch;
+    }
 
-	/**
-	 * @param textSearch the textSearch to set
-	 */
-	public void setTextSearch(String textSearch) {
-		this.textSearch = textSearch;
-	}
+    /**
+     * @param textSearch the textSearch to set
+     */
+    public void setTextSearch(String textSearch) {
+        this.textSearch = textSearch;
+    }
 
-	/**
-	 * @return the sortBy
-	 */
-	public String getSortBy() {
-		return sortBy;
-	}
+    /**
+     * @return the sortBy
+     */
+    public String getSortBy() {
+        return sortBy;
+    }
 
-	/**
-	 * @param sortBy the sortBy to set
-	 */
-	public void setSortBy(String sortBy) {
-		this.sortBy = sortBy;
-	}
+    /**
+     * @param sortBy the sortBy to set
+     */
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
 
-	/**
-	 * @return the tags
-	 */
-	public List<String> getTags() {
-		return tags;
-	}
+    /**
+     * @return the tags
+     */
+    public List<String> getTags() {
+        return tags;
+    }
 
-	/**
-	 * @param tags the tags to set
-	 */
-	public void setTags(List<String> tags) {
-		this.tags = tags;
-	}
+    /**
+     * @param tags the tags to set
+     */
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 }
