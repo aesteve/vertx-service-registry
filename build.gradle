@@ -1,58 +1,74 @@
-plugins {
-    id 'java'
-    id 'eclipse'
-    id 'com.github.johnrengelman.shadow' version '1.2.1'
-}
-
-repositories {
-	mavenLocal()
-    mavenCentral()
-    maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
-}
-
-dependencies {
-    // vertx
-	compile 'io.vertx:vertx-core:3.0.0-SNAPSHOT'
-	compile 'io.vertx:vertx-apex:3.0.0-SNAPSHOT'
-	
-	// utils
-	compile 'commons-io:commons-io:2.4'
-    compile 'com.google.guava:guava:18.0'
-	compile 'commons-httpclient:commons-httpclient:3.1'
-	
-	// logging
-	compile 'ch.qos.logback:logback-classic:1.1.2'
-	compile 'ch.qos.logback:logback-core:1.1.2'
-	compile 'org.codehaus.groovy:groovy-all:2.4.1'
-
-	// tests
-	testCompile group: 'io.vertx', name: 'vertx-core', version: '3.0.0-SNAPSHOT', classifier: 'tests'
-	testCompile 'junit:junit:4.12'
-}
-
 if (!JavaVersion.current().java8Compatible) {
-	throw new IllegalStateException("This needs Java 8. You are using ${JavaVersion.current()}.")
+    throw new IllegalStateException("This needs Java 8. You are using ${JavaVersion.current()}.")
 }
-
-shadowJar  {
-	classifier = 'vertx'
-	manifest {
-		attributes 'Main-Class': 'io.vertx.core.Starter'
-		attributes 'Main-Verticle': 'java:io.vertx.serviceregistry.WebServer'
-	}
-	mergeServiceFiles {
-		include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
-	}
+ 
+buildscript {
+	repositories { jcenter() }
 	dependencies {
-		exclude(dependency('io.vertx:codegen'))
-		exclude(dependency('junit:junit'))
-		exclude(dependency('org.mvel:mvel2'))
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
 	}
 }
 
-task start(dependsOn: shadowJar) << {
-	javaexec { main="-jar"; args shadowJar.archivePath } 
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+	
+	repositories {
+		mavenLocal()
+	    mavenCentral()
+	    maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
+	}
+	
+	dependencies {
+	    // vertx
+		compile 'io.vertx:vertx-core:3.0.0-SNAPSHOT'
+		
+		// tests
+		testCompile group: 'io.vertx', name: 'vertx-core', version: '3.0.0-SNAPSHOT', classifier: 'tests'
+		testCompile 'junit:junit:4.12'
+	}
 }
+
+configure(rootProject) {
+	apply plugin: 'com.github.johnrengelman.shadow'
+	
+	dependencies {
+		compile 'io.vertx:vertx-apex:3.0.0-SNAPSHOT'
+		compile project(':vertx-component-discovery')
+		
+		// utils
+		compile 'commons-io:commons-io:2.4'
+	    compile 'com.google.guava:guava:18.0'
+		compile 'commons-httpclient:commons-httpclient:3.1'
+		
+		// logging
+		compile 'ch.qos.logback:logback-classic:1.1.2'
+		compile 'ch.qos.logback:logback-core:1.1.2'
+		compile 'org.codehaus.groovy:groovy-all:2.4.1'
+	}
+	
+	shadowJar  {
+		classifier = 'vertx'
+		manifest {
+			attributes 'Main-Class': 'io.vertx.core.Starter'
+			attributes 'Main-Verticle': 'java:io.vertx.serviceregistry.WebServer'
+		}
+		mergeServiceFiles {
+			include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+		}
+		dependencies {
+			exclude(dependency('io.vertx:codegen'))
+			exclude(dependency('junit:junit'))
+			exclude(dependency('org.mvel:mvel2'))
+		}
+	}
+	
+	task start(dependsOn: shadowJar) << {
+		javaexec { main="-jar"; args shadowJar.archivePath }
+	}
+}
+
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.3'

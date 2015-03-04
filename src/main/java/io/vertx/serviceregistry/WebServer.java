@@ -6,6 +6,9 @@ import io.vertx.apiutils.JsonFinalizer;
 import io.vertx.apiutils.JsonPreProcessor;
 import io.vertx.apiutils.PaginationPostProcessor;
 import io.vertx.apiutils.PaginationPreProcessor;
+import io.vertx.componentdiscovery.DiscoveryService;
+import io.vertx.componentdiscovery.model.Artifact;
+import io.vertx.componentdiscovery.model.TaskReport;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
@@ -13,19 +16,25 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.apex.Router;
 import io.vertx.ext.apex.handler.StaticHandler;
 import io.vertx.ext.apex.handler.TemplateHandler;
-import io.vertx.serviceregistry.dao.ArtifactsDAO;
+import io.vertx.serviceregistry.dao.DAO;
 import io.vertx.serviceregistry.dao.impl.JsonArtifactsDAO;
+import io.vertx.serviceregistry.dao.impl.JsonReportDAO;
 import io.vertx.serviceregistry.engines.ReactTemplateEngine;
 import io.vertx.serviceregistry.handlers.ServicesContextHandler;
+import io.vertx.serviceregistry.handlers.api.ReportApiHandler;
 import io.vertx.serviceregistry.handlers.api.ServicesApiHandler;
 import io.vertx.serviceregistry.handlers.errors.ApiErrorHandler;
 import io.vertx.serviceregistry.handlers.errors.DevErrorHandler;
 import io.vertx.serviceregistry.http.etag.ETagCachingService;
 import io.vertx.serviceregistry.http.etag.impl.InMemoryETagCachingService;
+import io.vertx.serviceregistry.io.ApiObjectMarshaller;
+
+import java.io.File;
 
 public class WebServer implements Verticle {
 
@@ -33,19 +42,25 @@ public class WebServer implements Verticle {
 	private final static Integer DEFAULT_PORT = 8080;
 	private final static String DEFAULT_DATA_DIR = ".";
 	private final static String DEFAULT_ARTIFACTS_FILE = "export.json";
+	private final static String DEFAULT_REPORTS_FILE = "reports.json";
 
 	private JsonObject config;
 
 	private HttpServer server;
 	private String dataDir;
 	private String artifactsFile;
+	private String reportsFile;
 	private HttpServerOptions options;
 	private ReactTemplateEngine engine;
 	private ServicesContextHandler servicesContextHandler; // TODO : rename as something related to "injects queryParams into context"
 	private ServicesApiHandler servicesApiHandler;
-	private ArtifactsDAO artifactsDAO;
+	private ReportApiHandler reportApiHandler;
+	private DAO<Artifact> artifactsDAO;
+	private JsonReportDAO reportsDAO;
 	private Vertx vertx;
 	private ETagCachingService eTagCachingService;
+
+	private DiscoveryService discoveryService;
 
 	@Override
 	public void start(Future<Void> future) throws Exception {
@@ -62,7 +77,8 @@ public class WebServer implements Verticle {
 		apiRouter.route().handler(new PaginationPreProcessor());
 		apiRouter.route().handler(new ETagPreProcessor(eTagCachingService));
 		// data-processing
-		apiRouter.getWithRegex("/services(/|$)").handler(servicesApiHandler);
+		apiRouter.get("/report").handler(reportApiHandler);
+		apiRouter.get("/services").handler(servicesApiHandler);
 		apiRouter.get("/services/:serviceId").handler(servicesApiHandler);
 		// post-processing
 		apiRouter.route().handler(new PaginationPostProcessor());
@@ -73,14 +89,31 @@ public class WebServer implements Verticle {
 
 		router.route("/").handler(servicesContextHandler);
 		router.get("/sites").handler(TemplateHandler.create(engine, "", "text/html"));
+		router.get("/report").handler(routingContext -> {
+			routingContext.response().sendFile("sites/report.html");
+		});
 		router.get("/").handler(request -> request.response().sendFile("sites/index.html"));
 		router.get("/").failureHandler(new DevErrorHandler("error.html"));
 
 		server = vertx.createHttpServer(options);
 		server.requestHandler(router::accept);
-		server.listen();
-		future.complete();
-		System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
+
+		discoveryService.start(handler -> {
+			future.complete();
+			discoveryService.crawl(crawlHandler -> {
+				TaskReport<Artifact> report = crawlHandler.result();
+				reportsDAO.add(report);
+				report.subTasks.forEach(subTask -> {
+					if (!subTask.hasFailed()) {
+						artifactsDAO.replace(subTask.result());
+					}
+				});
+				vertx.fileSystem().writeFileBlocking(DEFAULT_ARTIFACTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
+				vertx.fileSystem().writeFileBlocking(DEFAULT_REPORTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
+			});
+			server.listen();
+			System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
+		});
 	}
 
 	@Override
@@ -132,6 +165,8 @@ public class WebServer implements Verticle {
 		} else {
 			artifactsFile = DEFAULT_ARTIFACTS_FILE;
 		}
+
+		reportsFile = DEFAULT_REPORTS_FILE;
 	}
 
 	@Override
@@ -144,11 +179,33 @@ public class WebServer implements Verticle {
 		this.vertx = vertx;
 		this.config = context.config();
 
+		// FIXME TODO : why can't I read the conf.json file ????
+		config.put("crawlers", new JsonArray().add(new JsonObject().put("name", "Maven Central")));
+
+		this.discoveryService = DiscoveryService.create(vertx, config);
+
 		checkConfig();
 		// Load artifacts from FS
-		Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "/" + artifactsFile);
-		artifactsDAO = new JsonArtifactsDAO(b.toString("UTF-8"));
+		File arts = new File(dataDir + "/" + artifactsFile);
+		if (arts.exists() && arts.isFile()) {
+			Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "/" + artifactsFile);
+			artifactsDAO = new JsonArtifactsDAO(b.toString("UTF-8"));
+		}
+		else {
+			artifactsDAO = new JsonArtifactsDAO("[]");
+		}
 		artifactsDAO.load();
+
+		// Load reports from FS
+		// Load artifacts from FS
+		File reports = new File(dataDir + "/" + reportsFile);
+		if (reports.exists() && reports.isFile()) {
+			Buffer b2 = vertx.fileSystem().readFileBlocking(dataDir + "/" + reportsFile);
+			reportsDAO = new JsonReportDAO(b2.toString("UTF-8"));
+		} else {
+			reportsDAO = new JsonReportDAO("[]");
+		}
+		reportsDAO.load();
 
 		// Pages-related (context, paths)
 		servicesContextHandler = new ServicesContextHandler(artifactsDAO);
@@ -158,5 +215,6 @@ public class WebServer implements Verticle {
 		// Api
 		eTagCachingService = new InMemoryETagCachingService();
 		servicesApiHandler = new ServicesApiHandler(artifactsDAO);
+		reportApiHandler = new ReportApiHandler(reportsDAO);
 	}
 }
