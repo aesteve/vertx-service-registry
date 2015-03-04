@@ -1,0 +1,7 @@
+{
+	"crawlers":[
+		{
+			"name":"mavenCentral"
+		}
+	]
+}
