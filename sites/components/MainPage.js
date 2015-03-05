@@ -4,13 +4,13 @@ var SearchBar = require('./SearchBar');
 var Services = require('./Services');
 var Pagination = require('./Pagination');
 var BackToTop = require('./BackToTop');
-var ServicesCollection = require('../model/ServicesCollection');
+var ServicesCollection = require('../model/PaginatedCollection');
 var _ = require('underscore');
 
 
 var DEFAULT_API_VERSION = 2;
 
-var servicesCollection = new ServicesCollection(DEFAULT_API_VERSION);
+var servicesCollection = new ServicesCollection(DEFAULT_API_VERSION, "services");
 
 var App = React.createClass({
     componentDidMount: function(){
@@ -54,7 +54,7 @@ var App = React.createClass({
         });
     },
     refreshServicesList: function(){
-        this.setState({matchingServices:servicesCollection.currentPageServices, fetchInProgress:false});
+        this.setState({matchingServices:servicesCollection.currentPageResources, fetchInProgress:false});
     },
     filtersChanged: function(newFilters){
         var instance_ = this;

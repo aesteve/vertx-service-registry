@@ -1,12 +1,13 @@
 var _ = require('underscore');
 var $ = require('jquery');
 
-var ServicesCollection = function(apiVersion){
+var ResourcesCollection = function(apiVersion, apiResource){
     this.apiVersion = apiVersion;
+    this.apiResource = apiResource;
     this.reset();
 };
 
-ServicesCollection.prototype.fetch = function(url){
+ResourcesCollection.prototype.fetch = function(url){
     var def = new $.Deferred();
     var instance_ = this;
     var getQueryParams = function(){
@@ -25,7 +26,7 @@ ServicesCollection.prototype.fetch = function(url){
         params.perPage=30;
         return params;
     };
-    var url = "/api/"+this.apiVersion+"/services/";
+    var url = "/api/"+this.apiVersion+"/"+this.apiResource+"/";
     $.ajax(url, {
         data:getQueryParams(),
         method:"GET",
@@ -33,7 +34,7 @@ ServicesCollection.prototype.fetch = function(url){
         contentType:"application/json",
         success:function(data, status, xhr){
             instance_.parseLinkHeader(xhr.getResponseHeader("Link"));
-            instance_.currentPageServices = data;
+            instance_.currentPageResources = data;
             def.resolve();
         },
         error:function(jqXhr, statusMsg, error){
@@ -44,11 +45,11 @@ ServicesCollection.prototype.fetch = function(url){
     return def;
 };
 
-ServicesCollection.prototype.setApiVersion = function(apiVersion){
+ResourcesCollection.prototype.setApiVersion = function(apiVersion){
     this.apiVersion = apiVersion;
 };
 
-ServicesCollection.prototype.parseLinkHeader = function(header){
+ResourcesCollection.prototype.parseLinkHeader = function(header){
     if (!header || header.length == 0) {
         this.pagination.current = 1;
         this.pagination.next = undefined;
@@ -82,25 +83,25 @@ ServicesCollection.prototype.parseLinkHeader = function(header){
     }
 };
 
-ServicesCollection.prototype.goTo = function(rel){
+ResourcesCollection.prototype.goTo = function(rel){
     var url = this.pagination[rel];
     var page = this.getParamValue(url, "page");
     this.pagination.current = page;
     return this.fetch();
 };
 
-ServicesCollection.prototype.getParamValue = function(url, name){
+ResourcesCollection.prototype.getParamValue = function(url, name){
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
     results = regex.exec(url);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
-ServicesCollection.prototype.setCurrentFromUrl = function(){
+ResourcesCollection.prototype.setCurrentFromUrl = function(){
     this.pagination.current = this.getParamValue(document.location.toString(), "page") || 1 ;
 };
 
-ServicesCollection.prototype.reset = function(){
+ResourcesCollection.prototype.reset = function(){
     this.pagination = {
         current:1,
         next:undefined,
@@ -109,7 +110,7 @@ ServicesCollection.prototype.reset = function(){
         last:undefined
     };
     this.filters = {};
-    this.currentPageServices = {};
+    this.currentPageResources = {};
 };
 
-module.exports = ServicesCollection;
+module.exports = ResourcesCollection;

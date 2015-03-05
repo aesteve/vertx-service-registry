@@ -17,7 +17,7 @@ var ServiceFoot = React.createClass({
             );// FIXME : add click handlers
         });
         var infos = service.complementaryInfos;
-        
+        var keywords;
         if (infos && infos['keywords'] && infos['keywords'].length > 0) {
             keywords = _.map(infos['keywords'], function(keyword, idx){
                 return (
