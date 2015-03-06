@@ -21,6 +21,10 @@ a, a:visited, a:active {
 	color:#336699;
 }
 
+.italic {
+	font-style:italic;
+}
+
 .fake-link:hover, .pagination-bar li.current-page a {
     text-decoration:none;
 }
@@ -74,6 +78,11 @@ div.content {
 	font-size:18px;
 	color:#336699;
 	cursor:pointer;
+}
+
+.important-text {
+	color:#336699;
+	
 }
 
 .service-main-content {

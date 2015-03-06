@@ -1,0 +1,17 @@
+.report-icon {
+	margin-right:10px;
+}
+
+.failure-icon {
+	color:red;
+	font-size:20px!important;
+}
+
+.success-icon {
+	color:green;
+	font-size:20px!important;
+}
+
+.hourglass-icon {
+	font-size:16px!important;
+}

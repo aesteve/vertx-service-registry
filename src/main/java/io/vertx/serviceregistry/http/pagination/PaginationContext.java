@@ -32,12 +32,12 @@ public class PaginationContext {
     private Integer totalPages; // Will be set once the request has been processed (payload)
 
     /**
-     * Made it private 'cause I'd prefer it to by intrinsequely linked to a routing context
+     * Prefer using fromRoutingContext but can be instanciated directly (for static page generation for instance)
      * 
      * @param pageAsked
      * @param itemsPerPage
      */
-    private PaginationContext(Integer pageAsked, Integer itemsPerPage) {
+    public PaginationContext(Integer pageAsked, Integer itemsPerPage) {
         if (pageAsked != null)
             this.pageAsked = pageAsked;
         if (itemsPerPage != null)

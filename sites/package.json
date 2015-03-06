@@ -10,6 +10,7 @@
         "statics": "^0.1.0",
         "underscore":"^1.8.2",
         "moment":"^2.9.0",
-        "uglify-js":"^2.4.16"
+        "uglify-js":"^2.4.16",
+        "sockjs-client":"^1.0.0-beta.12"
 	}
 }
