@@ -24,6 +24,7 @@ mods
 gradle.properties
 site/node_modules
 site/scripts/
+tpl
 server.log
 export.json
 reports.json
