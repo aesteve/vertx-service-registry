@@ -93,11 +93,11 @@ public class Config {
 	}
 
 	public String getArtifactsFile() {
-		return getWorkDir() + ARTIFACTS_FILE;
+		return getWorkDir() + "/" + ARTIFACTS_FILE;
 	}
 
 	public String getReportsFile() {
-		return getWorkDir() + REPORTS_FILE;
+		return getWorkDir() + "/" + REPORTS_FILE;
 	}
 
 	public JsonArray getCrawlers() {

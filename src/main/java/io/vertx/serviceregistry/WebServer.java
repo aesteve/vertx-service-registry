@@ -8,6 +8,7 @@ import io.vertx.apiutils.PaginationPostProcessor;
 import io.vertx.apiutils.PaginationPreProcessor;
 import io.vertx.componentdiscovery.DiscoveryService;
 import io.vertx.componentdiscovery.model.Artifact;
+import io.vertx.componentdiscovery.model.TaskReport;
 import io.vertx.componentdiscovery.utils.EbAddresses;
 import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
@@ -34,8 +35,11 @@ import io.vertx.serviceregistry.handlers.api.ServicesApiHandler;
 import io.vertx.serviceregistry.handlers.errors.ApiErrorHandler;
 import io.vertx.serviceregistry.http.etag.ETagCachingService;
 import io.vertx.serviceregistry.http.etag.impl.InMemoryETagCachingService;
+import io.vertx.serviceregistry.io.ApiObjectMarshaller;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Main Verticle handling web stuff
@@ -103,30 +107,29 @@ public class WebServer implements Verticle {
 		server.requestHandler(router::accept);
 
 		discoveryService.start(handler -> {
-			/*
-			 * discoveryService.crawl(crawlHandler -> {
-			 * TaskReport report = crawlHandler.result();
-			 * reportsDAO.add(report);
-			 * report.subTasks().forEach(subTask -> {
-			 * if (!subTask.hasFailed()) {
-			 * List<Artifact> result = new ArrayList<Artifact>();
-			 * artifactsDAO.replace((List<Artifact>) result);
-			 * }
-			 * });
-			 * vertx.fileSystem().writeFileBlocking(DEFAULT_ARTIFACTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
-			 * vertx.fileSystem().writeFileBlocking(DEFAULT_REPORTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
-			 * });
-			 */
-				PageGenerator pageWorker = new PageGenerator(artifactsDAO, reportsDAO, tplRegistry);
-				vertx.deployVerticle(pageWorker, new DeploymentOptions().setWorker(true), workerHandler -> {
-					server.listen();
-					future.complete();
-					HttpServerOptions options = Config.get().getServerOptions();
-					System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
-					vertx.eventBus().publish(EbAddresses.PAGE_GENERATOR.toString(), "generate");
+			discoveryService.crawl(crawlHandler -> {
+				TaskReport report = crawlHandler.result();
+				reportsDAO.add(report);
+				report.subTasks().forEach(subTask -> {
+					if (!subTask.hasFailed()) {
+						List<Artifact> result = new ArrayList<Artifact>();
+						artifactsDAO.replace(result);
+					}
 				});
-
+				vertx.fileSystem().writeFileBlocking(Config.get().getArtifactsFile(), Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
+				vertx.fileSystem().writeFileBlocking(Config.get().getReportsFile(), Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
 			});
+
+			PageGenerator pageWorker = new PageGenerator(artifactsDAO, reportsDAO, tplRegistry);
+			vertx.deployVerticle(pageWorker, new DeploymentOptions().setWorker(true), workerHandler -> {
+				server.listen();
+				future.complete();
+				HttpServerOptions options = Config.get().getServerOptions();
+				System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
+				vertx.eventBus().publish(EbAddresses.PAGE_GENERATOR.toString(), "generate");
+			});
+
+		});
 	}
 
 	@Override
