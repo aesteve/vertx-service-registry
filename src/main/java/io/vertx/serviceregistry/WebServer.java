@@ -72,7 +72,7 @@ public class WebServer implements Verticle {
 
 		StaticHandler staticHandler = StaticHandler.create();
 		staticHandler.setWebRoot("site");
-		staticHandler.setDirectoryListing(true);
+		staticHandler.setDirectoryListing(false);
 		router.route("/assets/*").handler(staticHandler);
 
 		Router apiRouter = Router.router(vertx);
