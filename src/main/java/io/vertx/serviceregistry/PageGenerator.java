@@ -91,7 +91,7 @@ public class PageGenerator implements Verticle {
 			global.addTask(pageReport);
 		}
 		for (int i = 1; i <= nbPages; i++) {
-			ReactComponentParser parser = new ReactComponentParser("site/scripts/server-bundle.js");
+			ReactComponentParser parser = new ReactComponentParser(Config.get().getJSServerBundle());
 			TaskReport pageReport = global.subTasks().get(i - 1);
 			pageReport.start();
 			SockJSFactory.notifyClients(global.toJsonObject()); // progress

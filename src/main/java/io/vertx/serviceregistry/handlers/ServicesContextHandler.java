@@ -25,7 +25,6 @@ public class ServicesContextHandler implements Handler<RoutingContext> {
 		context.put("filters", criteria);
 		try {
 			PaginationContext paginationContext = PaginationContext.fromContext(context);
-			System.out.println("put pagination context " + paginationContext);
 			context.put("paginationContext", paginationContext);
 			List<Artifact> artifacts = dao.getPaginatedItems(paginationContext, criteria);
 			context.put("services", ApiObjectMarshaller.marshallArtifacts(artifacts));

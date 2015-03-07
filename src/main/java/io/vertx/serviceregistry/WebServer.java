@@ -34,33 +34,28 @@ import io.vertx.serviceregistry.handlers.api.ServicesApiHandler;
 import io.vertx.serviceregistry.handlers.errors.ApiErrorHandler;
 import io.vertx.serviceregistry.http.etag.ETagCachingService;
 import io.vertx.serviceregistry.http.etag.impl.InMemoryETagCachingService;
-import io.vertx.serviceregistry.io.ApiObjectMarshaller;
 
 import java.io.File;
 
+/**
+ * Main Verticle handling web stuff
+ * 
+ * Intantiate/Orchestrates everything, responds to clients
+ * 
+ * @author aesteve
+ */
 public class WebServer implements Verticle {
 
-	private final static String DEFAULT_ADDRESS = "localhost";
-	private final static Integer DEFAULT_PORT = 8080;
-	private final static String DEFAULT_DATA_DIR = ".";
-	private final static String DEFAULT_ARTIFACTS_FILE = "export.json";
-	private final static String DEFAULT_REPORTS_FILE = "reports.json";
-
-	private JsonObject config;
-
+	private Vertx vertx;
 	private HttpServer server;
-	private String dataDir;
-	private String tplDir;
-	private String artifactsFile;
-	private String reportsFile;
-	private HttpServerOptions options;
-	private ServicesContextHandler servicesContextHandler; // TODO : rename as something related to "injects queryParams into context"
+
+	private DAO<Artifact> artifactsDAO;
+	private JsonReportDAO reportsDAO;
+
+	private ServicesContextHandler servicesContextHandler;
 	private ServicesApiHandler servicesApiHandler;
 	private ReportApiHandler reportApiHandler;
 	private CloudTagApiHandler cloudTagApiHandler;
-	private DAO<Artifact> artifactsDAO;
-	private JsonReportDAO reportsDAO;
-	private Vertx vertx;
 	private ETagCachingService eTagCachingService;
 
 	private DiscoveryService discoveryService;
@@ -71,7 +66,7 @@ public class WebServer implements Verticle {
 		Router router = Router.router(vertx);
 
 		StaticHandler staticHandler = StaticHandler.create();
-		staticHandler.setWebRoot("site");
+		staticHandler.setWebRoot(Config.get().getSiteDir());
 		staticHandler.setDirectoryListing(false);
 		router.route("/assets/*").handler(staticHandler);
 
@@ -95,16 +90,16 @@ public class WebServer implements Verticle {
 		router.get("/services").handler(servicesContextHandler);
 		router.get("/services").handler(new StaticHtmlHandler(tplRegistry));
 		router.get("/report").handler(routingContext -> {
-			routingContext.response().sendFile("site/report.html");
+			routingContext.response().sendFile(Config.get().getSiteDir() + "/report.html");
 		});
 		router.get("/cloud").handler(routingContext -> {
-			routingContext.response().sendFile("site/cloud.html");
+			routingContext.response().sendFile(Config.get().getSiteDir() + "/cloud.html");
 		});
 
 		router.route("/sockets/*").handler(SockJSFactory.createSocketHandler(vertx));
 		// router.route().failureHandler(new DevErrorHandler("error.html"));
 
-		server = vertx.createHttpServer(options);
+		server = vertx.createHttpServer(Config.get().getServerOptions());
 		server.requestHandler(router::accept);
 
 		discoveryService.start(handler -> {
@@ -126,6 +121,7 @@ public class WebServer implements Verticle {
 				vertx.deployVerticle(pageWorker, new DeploymentOptions().setWorker(true), workerHandler -> {
 					server.listen();
 					future.complete();
+					HttpServerOptions options = Config.get().getServerOptions();
 					System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
 					vertx.eventBus().publish(EbAddresses.PAGE_GENERATOR.toString(), "generate");
 				});
@@ -135,59 +131,8 @@ public class WebServer implements Verticle {
 
 	@Override
 	public void stop(Future<Void> future) throws Exception {
-		vertx.fileSystem().writeFileBlocking(DEFAULT_ARTIFACTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
-		vertx.fileSystem().writeFileBlocking(DEFAULT_REPORTS_FILE, Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
 		future.complete();
 		System.out.println("Vertx-Service-Registry stopped");
-	}
-
-	private void checkConfig() {
-		// TODO : describe it as a general behaviour :
-		// first config
-		// then openshift
-		// then default
-
-		options = new HttpServerOptions();
-
-		if (config.getInteger("port") != null) {
-			options.setPort(config.getInteger("port"));
-		} else {
-			final String envPort = System.getenv("OPENSHIFT_DIY_PORT");
-			if (envPort != null)
-				options.setPort(Integer.parseInt(envPort));
-			else
-				options.setPort(DEFAULT_PORT);
-		}
-
-		if (config.getString("host") != null) {
-			options.setHost(config.getString("host"));
-		} else {
-			String address = System.getenv("OPENSHIFT_DIY_IP");
-			if (address != null)
-				options.setHost(address);
-			else
-				options.setHost(DEFAULT_ADDRESS);
-		}
-
-		if (config.getString("data-dir") != null) {
-			dataDir = config.getString("data-dir");
-		} else {
-			dataDir = System.getenv("OPENSHIFT_DATA_DIR");
-			if (dataDir == null)
-				dataDir = DEFAULT_DATA_DIR;
-		}
-		tplDir = dataDir + "/tpl";
-		if (!vertx.fileSystem().existsBlocking(tplDir)) {
-			vertx.fileSystem().mkdirBlocking(tplDir);
-		}
-
-		if (config.getString("artifacts-file") != null) {
-			artifactsFile = config.getString("artifacts-file");
-		} else {
-			artifactsFile = DEFAULT_ARTIFACTS_FILE;
-		}
-
-		reportsFile = DEFAULT_REPORTS_FILE;
 	}
 
 	@Override
@@ -198,18 +143,17 @@ public class WebServer implements Verticle {
 	@Override
 	public void init(Vertx vertx, Context context) {
 		this.vertx = vertx;
-		this.config = context.config();
+		JsonArray crawlers = new JsonArray();
+		crawlers.add(new JsonObject().put("name", "Maven Central"));
 
-		// FIXME TODO : why can't I read the conf.json file ????
-		config.put("crawlers", new JsonArray().add(new JsonObject().put("name", "Maven Central")));
+		Config conf = Config.create(vertx, new JsonObject().put("crawlers", crawlers));
 
-		this.discoveryService = DiscoveryService.create(vertx, config);
+		this.discoveryService = DiscoveryService.create(vertx, conf.getCrawlers());
 
-		checkConfig();
 		// Load artifacts from FS
-		File arts = new File(dataDir + "/" + artifactsFile);
+		File arts = new File(conf.getArtifactsFile());
 		if (arts.exists() && arts.isFile()) {
-			Buffer b = vertx.fileSystem().readFileBlocking(dataDir + "/" + artifactsFile);
+			Buffer b = vertx.fileSystem().readFileBlocking(conf.getArtifactsFile());
 			artifactsDAO = new JsonArtifactsDAO(b.toString("UTF-8"));
 		} else {
 			artifactsDAO = new JsonArtifactsDAO("[]");
@@ -218,9 +162,9 @@ public class WebServer implements Verticle {
 
 		// Load reports from FS
 		// Load artifacts from FS
-		File reports = new File(dataDir + "/" + reportsFile);
+		File reports = new File(conf.getReportsFile());
 		if (reports.exists() && reports.isFile()) {
-			Buffer b2 = vertx.fileSystem().readFileBlocking(dataDir + "/" + reportsFile);
+			Buffer b2 = vertx.fileSystem().readFileBlocking(conf.getReportsFile());
 			reportsDAO = new JsonReportDAO(b2.toString("UTF-8"));
 		} else {
 			reportsDAO = new JsonReportDAO("[]");
@@ -229,7 +173,7 @@ public class WebServer implements Verticle {
 
 		// Pages-related (context, paths)
 		servicesContextHandler = new ServicesContextHandler(artifactsDAO);
-		tplRegistry = new StaticTemplatesRegistry(vertx, tplDir);
+		tplRegistry = new StaticTemplatesRegistry(vertx, conf.getTplDir());
 
 		// Api
 		eTagCachingService = new InMemoryETagCachingService();

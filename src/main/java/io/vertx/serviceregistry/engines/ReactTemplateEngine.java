@@ -6,6 +6,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.apex.RoutingContext;
 import io.vertx.ext.apex.templ.TemplateEngine;
+import io.vertx.serviceregistry.Config;
 import io.vertx.serviceregistry.engines.react.ReactComponentParser;
 import io.vertx.serviceregistry.engines.react.exceptions.ComponentParsingException;
 
@@ -41,7 +42,7 @@ public class ReactTemplateEngine implements TemplateEngine {
 		// TODO : make it a whole pipeline thing : just render from a minified
 		// js file in prod env + store generated html to cache
 		// TODO : make it async : do not block everything
-		ReactComponentParser parser = new ReactComponentParser("site/scripts/server-bundle.js");
+		ReactComponentParser parser = new ReactComponentParser(Config.get().getJSServerBundle());
 		try {
 			String reactHtml = parser.parseComponentTree(context.data());
 			String fullHtml = decorateTplWith(reactHtml);
