@@ -16,13 +16,13 @@ import javax.script.ScriptException;
 
 public class ReactComponentParser {
 	private ScriptEngine nashorn;
-	private String rootComponentFile;
+	private String jsBundle;
 	private Bindings bindings;
 
 	private ScriptEngineManager scriptEngineManager;
 
-	public ReactComponentParser(String rootComponentFile) {
-		this.rootComponentFile = rootComponentFile;
+	public ReactComponentParser(String jsBundle) {
+		this.jsBundle = jsBundle;
 		scriptEngineManager = new ScriptEngineManager();
 	}
 
@@ -52,7 +52,7 @@ public class ReactComponentParser {
 			bindings.put("nashorn_services", list);
 			PaginationContext paginationContext = (PaginationContext) props.get("paginationContext");
 			bindings.put("paginationContext", paginationContext.toJsonObject());
-			nashorn.eval(ScriptsResolver.getScriptReaderFromFile(rootComponentFile));
+			nashorn.eval(ScriptsResolver.getScriptReaderFromFile(jsBundle));
 			return bindings.get("reactRenderedResult").toString();
 		} catch (FileNotFoundException | ScriptException e) {
 			throw new ComponentParsingException(e);
