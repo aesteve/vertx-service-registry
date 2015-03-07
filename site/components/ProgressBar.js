@@ -3,7 +3,7 @@ var React = require('react');
 var ProgressBar = React.createClass({
 	render: function(){
 		return (
-			<div>{this.props.current}/{this.props.total}<div>
+			<progress className="task-progress" value={this.props.current} max={this.props.total}></progress>
 		);
 	}
 });

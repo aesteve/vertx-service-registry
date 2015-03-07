@@ -18,6 +18,6 @@ public class ServerSideRendering {
 		bindings.put("console", "{}");
 		bindings.put("initialProps", "{services:[]}");
 		engine.eval(new FileReader("src/main/resources/console.js"));
-		engine.eval(new FileReader("sites/scripts/server-bundle.js"));
+		engine.eval(new FileReader("site/scripts/server-bundle.js"));
 	}
 }

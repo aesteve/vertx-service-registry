@@ -41,7 +41,7 @@ public class ReactTemplateEngine implements TemplateEngine {
 		// TODO : make it a whole pipeline thing : just render from a minified
 		// js file in prod env + store generated html to cache
 		// TODO : make it async : do not block everything
-		ReactComponentParser parser = new ReactComponentParser("sites/scripts/server-bundle.js");
+		ReactComponentParser parser = new ReactComponentParser("site/scripts/server-bundle.js");
 		try {
 			String reactHtml = parser.parseComponentTree(context.data());
 			String fullHtml = decorateTplWith(reactHtml);

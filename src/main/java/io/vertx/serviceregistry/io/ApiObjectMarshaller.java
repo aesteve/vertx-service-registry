@@ -4,6 +4,7 @@ import io.vertx.componentdiscovery.model.Artifact;
 import io.vertx.componentdiscovery.model.TaskReport;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.serviceregistry.model.WordAndWeight;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,4 +48,11 @@ public class ApiObjectMarshaller {
 		return list.stream().map(map -> TaskReport.fromMap(map)).collect(Collectors.toList());
 	}
 
+	public static JsonArray marshallCloud(Collection<WordAndWeight> items) {
+		if (items == null) {
+			return null;
+		}
+		List<JsonObject> objs = items.stream().map(word -> word.toJsonObject()).collect(Collectors.toList());
+		return new JsonArray(objs);
+	}
 }

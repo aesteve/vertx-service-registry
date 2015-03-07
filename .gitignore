@@ -22,8 +22,8 @@ test-tmp
 mods
 .vertx
 gradle.properties
-sites/node_modules
-sites/scripts/
+site/node_modules
+site/scripts/
 server.log
 export.json
 reports.json

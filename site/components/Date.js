@@ -6,7 +6,11 @@ var Date = React.createClass({
         return <span className="date">{this.format()}</span>
     },
     format: function(){
-        return moment(this.props.timestamp).format('DD/MM/YYYY, HH:mm:ss');
+    	var date = moment(this.props.timestamp);
+    	if (this.props.humanize){
+    		return date.fromNow();
+    	} 
+        return date.format('DD/MM/YYYY, HH:mm:ss');
     }
 });
 

@@ -13,27 +13,28 @@ import java.util.List;
 
 public class ServicesContextHandler implements Handler<RoutingContext> {
 
-    private DAO<Artifact> dao;
+	private DAO<Artifact> dao;
 
-    public ServicesContextHandler(DAO<Artifact> dao) {
-        this.dao = dao;
-    }
+	public ServicesContextHandler(DAO<Artifact> dao) {
+		this.dao = dao;
+	}
 
-    @Override
-    public void handle(RoutingContext context) {
-        SearchCriteria criteria = SearchCriteria.fromPageRequest(context.request());
-        context.put("filters", criteria);
-        try {
-            PaginationContext paginationContext = PaginationContext.fromContext(context);
-            context.put("paginationContext", paginationContext);
-            List<Artifact> artifacts = dao.getPaginatedItems(paginationContext, criteria);
-            context.put("services", ApiObjectMarshaller.marshallArtifacts(artifacts));
-        } catch (HttpException he) {
-            context.response().setStatusCode(he.getStatusCode());
-            context.response().setStatusMessage(he.getStatusMessage());
-            context.fail(he.getStatusCode());
-            return;
-        }
-        context.next();
-    }
+	@Override
+	public void handle(RoutingContext context) {
+		SearchCriteria criteria = SearchCriteria.fromPageRequest(context.request());
+		context.put("filters", criteria);
+		try {
+			PaginationContext paginationContext = PaginationContext.fromContext(context);
+			System.out.println("put pagination context " + paginationContext);
+			context.put("paginationContext", paginationContext);
+			List<Artifact> artifacts = dao.getPaginatedItems(paginationContext, criteria);
+			context.put("services", ApiObjectMarshaller.marshallArtifacts(artifacts));
+		} catch (HttpException he) {
+			context.response().setStatusCode(he.getStatusCode());
+			context.response().setStatusMessage(he.getStatusMessage());
+			context.fail(he.getStatusCode());
+			return;
+		}
+		context.next();
+	}
 }

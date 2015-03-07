@@ -21,6 +21,10 @@ a, a:visited, a:active {
 	color:#336699;
 }
 
+.spacer-right {
+	margin-right:10px;
+}
+
 .italic {
 	font-style:italic;
 }
@@ -315,4 +319,10 @@ input:-moz-placeholder { font-style:italic;padding-left:5px; }
 
 .api-switch {
     line-height:30px;
+}
+
+#cloud {
+	width:500;
+	height:500;
+	margin:0 auto;
 }

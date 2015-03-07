@@ -19,7 +19,15 @@ var ReportPage = React.createClass({
         socket = new SockJS("localhost:8080/sockets");
         socket.onmessage = function (message) {
         	var report = JSON.parse(message.data);
-        	instance_.setState({reportInProgress:report});
+        	if (report.endTime) {
+        		instance_.state.reports.push(report);
+        		instance_.replaceState({reports:instance_.state.reports});
+        		instance_.forceUpdate();
+        		console.log("forceUpdate");
+        	} else {
+        		instance_.setState({reportInProgress:report});        		
+        	}
+        	
         };
     },
     componentWillUnmount: function(){
@@ -36,22 +44,29 @@ var ReportPage = React.createClass({
         };
     },
     render:function(){
-        var reports = _.map(this.state.reports, function(report){
+    	var reports = _.sortBy(this.state.reports, function(report){
+    		return - report.startTime;
+    	});
+        var reports = _.map(reports, function(report){
             return (
                 <Report key = {report.name + '_' + report.startTime} report={report} />
             );
         });
+        var displayProgress = this.state.reportInProgress && !this.state.reportInProgress.endTime;
         return (
             <div>
                 <h1>Services discovery reports</h1>
                 {this.state.reportInProgress && 
                 <div className="task-in-progress">
-                	In progress:
+                	<h2>In progress:</h2>
                 	<Report report={this.state.reportInProgress} inProgress={true} />
                 	<hr />
                 </div>
                 }
-                {reports}
+                <div className="past-reports">
+	                <h2>Past reports</h2>
+	                {reports}
+                </div>
             </div>
         );
     }
