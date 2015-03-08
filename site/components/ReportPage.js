@@ -16,7 +16,7 @@ var ReportPage = React.createClass({
         reportsCollection.fetch().done(function(){
             instance_.refreshReports();
         });
-        socket = new SockJS("localhost:8080/sockets");
+        socket = new SockJS("/sockets");
         socket.onmessage = function (message) {
         	var report = JSON.parse(message.data);
         	if (report.endTime) {
