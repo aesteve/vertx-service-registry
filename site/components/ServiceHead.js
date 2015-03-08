@@ -6,9 +6,13 @@ var ServiceHead = React.createClass({
     render: function(){
         var service = this.props.service;
         var latestVersion = service.versions[service.versions.length-1];
+        var serviceIcon = "/assets/img/service-icon-"+service.type+".png";
         return (
             <div className="service-head" onClick={this.toggleContent}>
-                <div className="left">
+	            <div className="left spacer-right">
+		        	<img src={serviceIcon} />
+        		</div>
+            	<div className="left">
                     {service.artifactId}
                 </div>
                 <div className="right latest-version">

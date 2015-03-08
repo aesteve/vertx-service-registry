@@ -38,7 +38,6 @@ import io.vertx.serviceregistry.http.etag.impl.InMemoryETagCachingService;
 import io.vertx.serviceregistry.io.ApiObjectMarshaller;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,13 +110,15 @@ public class WebServer implements Verticle {
 				TaskReport report = crawlHandler.result();
 				reportsDAO.add(report);
 				report.subTasks().forEach(subTask -> {
+					System.out.println(subTask.name());
 					if (!subTask.hasFailed()) {
-						List<Artifact> result = new ArrayList<Artifact>();
+						List<Artifact> result = ((List<Artifact>) subTask.result());
 						artifactsDAO.replace(result);
 					}
 				});
 				vertx.fileSystem().writeFileBlocking(Config.get().getArtifactsFile(), Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
 				vertx.fileSystem().writeFileBlocking(Config.get().getReportsFile(), Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
+				vertx.eventBus().send(EbAddresses.PAGE_GENERATOR.toString(), "generate");
 			});
 
 			PageGenerator pageWorker = new PageGenerator(artifactsDAO, reportsDAO, tplRegistry);
@@ -126,7 +127,6 @@ public class WebServer implements Verticle {
 				future.complete();
 				HttpServerOptions options = Config.get().getServerOptions();
 				System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
-				vertx.eventBus().publish(EbAddresses.PAGE_GENERATOR.toString(), "generate");
 			});
 
 		});
