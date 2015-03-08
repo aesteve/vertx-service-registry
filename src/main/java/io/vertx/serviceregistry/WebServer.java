@@ -49,6 +49,8 @@ import java.util.List;
  */
 public class WebServer implements Verticle {
 
+	private final static long CRAWL_PERIOD = 3600 * 24 * 1000;
+
 	private Vertx vertx;
 	private HttpServer server;
 
@@ -106,20 +108,7 @@ public class WebServer implements Verticle {
 		server.requestHandler(router::accept);
 
 		discoveryService.start(handler -> {
-			discoveryService.crawl(crawlHandler -> {
-				TaskReport report = crawlHandler.result();
-				reportsDAO.add(report);
-				report.subTasks().forEach(subTask -> {
-					System.out.println(subTask.name());
-					if (!subTask.hasFailed()) {
-						List<Artifact> result = ((List<Artifact>) subTask.result());
-						artifactsDAO.replace(result);
-					}
-				});
-				vertx.fileSystem().writeFileBlocking(Config.get().getArtifactsFile(), Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
-				vertx.fileSystem().writeFileBlocking(Config.get().getReportsFile(), Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
-				vertx.eventBus().send(EbAddresses.PAGE_GENERATOR.toString(), "generate");
-			});
+			crawlAndHandle();
 
 			PageGenerator pageWorker = new PageGenerator(artifactsDAO, reportsDAO, tplRegistry);
 			vertx.deployVerticle(pageWorker, new DeploymentOptions().setWorker(true), workerHandler -> {
@@ -128,7 +117,26 @@ public class WebServer implements Verticle {
 				HttpServerOptions options = Config.get().getServerOptions();
 				System.out.println("Vertx-Service-Registry listening on port " + options.getPort() + " , address " + options.getHost());
 			});
+		});
+	}
 
+	private void crawlAndHandle() {
+		discoveryService.crawl(crawlHandler -> {
+			TaskReport report = crawlHandler.result();
+			reportsDAO.add(report);
+			report.subTasks().forEach(subTask -> {
+				System.out.println(subTask.name());
+				if (!subTask.hasFailed()) {
+					List<Artifact> result = ((List<Artifact>) subTask.result());
+					artifactsDAO.replace(result);
+				}
+			});
+			vertx.fileSystem().writeFileBlocking(Config.get().getArtifactsFile(), Buffer.buffer(ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getAll()).toString()));
+			vertx.fileSystem().writeFileBlocking(Config.get().getReportsFile(), Buffer.buffer(ApiObjectMarshaller.marshallReports(reportsDAO.getAll()).toString()));
+			vertx.eventBus().send(EbAddresses.PAGE_GENERATOR.toString(), "generate");
+			vertx.setTimer(CRAWL_PERIOD, timerId -> {
+				crawlAndHandle();
+			});
 		});
 	}
 
