@@ -49,6 +49,7 @@ configure(rootProject) {
 	}
 	
 	shadowJar  {
+		dependsOn 'copyFront'
 		classifier = 'vertx'
 		manifest {
 			attributes 'Main-Class': 'io.vertx.core.Starter'
@@ -62,6 +63,12 @@ configure(rootProject) {
 			exclude(dependency('junit:junit'))
 			exclude(dependency('org.mvel:mvel2'))
 		}
+	}
+	
+	task copyFront(type:Copy) {
+		from 'site'
+		into "$sourceSets.main.output.resourcesDir/site"
+		exclude "node_modules"
 	}
 	
 	task start(dependsOn: shadowJar) << {

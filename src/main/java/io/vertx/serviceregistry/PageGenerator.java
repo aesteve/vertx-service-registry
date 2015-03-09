@@ -11,7 +11,6 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.serviceregistry.dao.DAO;
 import io.vertx.serviceregistry.engines.react.ReactComponentParser;
-import io.vertx.serviceregistry.engines.react.exceptions.ComponentParsingException;
 import io.vertx.serviceregistry.fileutils.StaticTemplatesRegistry;
 import io.vertx.serviceregistry.handlers.SockJSFactory;
 import io.vertx.serviceregistry.http.exceptions.BadRequestException;
@@ -21,7 +20,9 @@ import io.vertx.serviceregistry.io.ApiObjectMarshaller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -100,8 +101,14 @@ public class PageGenerator implements Verticle {
 			props.put("paginationContext", paginationContext);
 			String staticHtml;
 			try {
-				props.put("services", ApiObjectMarshaller.marshallArtifacts(artifactsDAO.getPaginatedItems(paginationContext, null)));
-				staticHtml = parser.parseComponentTree(props);
+				List<Artifact> services = artifactsDAO.getPaginatedItems(paginationContext, null);
+				props.put("services", ApiObjectMarshaller.marshallArtifacts(services));
+				StringJoiner joiner = new StringJoiner(" , ");
+				services.forEach(service -> {
+					joiner.add(service.toJsonObject().toString());
+				});
+				staticHtml = joiner.toString();
+				// parser.parseComponentTree(props); // doesn't work on OpenShift : crashes cartridge
 				URL url = Resources.getResource(htmlTpl);
 				String fullPage = Resources.toString(url, Charsets.UTF_8);
 				fullPage = fullPage.replaceAll("\\{content\\}", Matcher.quoteReplacement(staticHtml));
@@ -109,7 +116,7 @@ public class PageGenerator implements Verticle {
 				pageReport.progress();
 				tplRegistry.store("services", paginationContext, fullPage);
 				global.progress();
-			} catch (ComponentParsingException | BadRequestException | IOException e) {
+			} catch (/* ComponentParsingException | */BadRequestException | IOException e) {
 				log.log(Level.SEVERE, "Failed : ", e);
 				System.out.println("FAILED : " + e.getMessage());
 				pageReport.fail(e);
